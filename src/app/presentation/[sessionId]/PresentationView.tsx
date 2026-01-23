@@ -170,9 +170,12 @@ export function PresentationView({
             background: #0a0a0a;
             border-radius: 12px;
             margin-bottom: 40px;
-            aspect-ratio: 16 / 9;
-            overflow: hidden;
+            min-height: 675px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+          }
+
+          .idea-slide {
+            min-height: auto;
           }
         }
 
@@ -201,10 +204,16 @@ export function PresentationView({
             height: 100vh;
             margin: 0;
             border-radius: 0;
+            overflow: hidden;
           }
 
           .slide:last-child {
             page-break-after: auto;
+          }
+
+          .slide-content {
+            transform: scale(0.9);
+            transform-origin: top left;
           }
         }
 
@@ -216,7 +225,7 @@ export function PresentationView({
 
         .slide-content {
           height: 100%;
-          padding: 48px 64px;
+          padding: 32px 48px;
           display: flex;
           flex-direction: column;
         }
@@ -226,6 +235,7 @@ export function PresentationView({
           justify-content: center;
           align-items: center;
           text-align: center;
+          padding: 48px 64px;
         }
 
         .title-content {
@@ -237,17 +247,17 @@ export function PresentationView({
         }
 
         .subtitle {
-          font-size: 18px;
+          font-size: 16px;
           text-transform: uppercase;
           letter-spacing: 3px;
           color: #0066FF;
-          margin-bottom: 16px;
+          margin-bottom: 12px;
         }
 
         .main-title {
-          font-size: 72px;
+          font-size: 56px;
           font-weight: 800;
-          margin: 0 0 24px 0;
+          margin: 0 0 16px 0;
           background: linear-gradient(135deg, #fff 0%, #ccc 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -255,43 +265,43 @@ export function PresentationView({
         }
 
         .properties-list {
-          font-size: 28px;
+          font-size: 22px;
           color: #888;
-          margin-bottom: 32px;
+          margin-bottom: 24px;
         }
 
         .meta-info {
           display: flex;
-          gap: 16px;
-          margin-bottom: 24px;
+          gap: 12px;
+          margin-bottom: 16px;
         }
 
         .lane-badge {
           background: #0066FF;
-          padding: 8px 20px;
+          padding: 6px 16px;
           border-radius: 24px;
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 600;
         }
 
         .tech-badges {
           background: rgba(255, 255, 255, 0.1);
-          padding: 8px 20px;
+          padding: 6px 16px;
           border-radius: 24px;
-          font-size: 14px;
+          font-size: 13px;
         }
 
         .idea-count {
-          font-size: 20px;
+          font-size: 16px;
           color: #666;
         }
 
         .branding {
-          padding-top: 24px;
+          padding-top: 16px;
         }
 
         .brand-text {
-          font-size: 14px;
+          font-size: 12px;
           color: #444;
           letter-spacing: 2px;
           text-transform: uppercase;
@@ -302,13 +312,13 @@ export function PresentationView({
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 32px;
-          padding-bottom: 16px;
+          margin-bottom: 16px;
+          padding-bottom: 12px;
           border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .idea-number {
-          font-size: 14px;
+          font-size: 12px;
           text-transform: uppercase;
           letter-spacing: 2px;
           color: #0066FF;
@@ -316,15 +326,15 @@ export function PresentationView({
         }
 
         .client-name {
-          font-size: 14px;
+          font-size: 12px;
           color: #666;
         }
 
         .slide-body {
           flex: 1;
           display: grid;
-          grid-template-columns: 1.2fr 1fr;
-          gap: 48px;
+          grid-template-columns: 1.3fr 1fr;
+          gap: 32px;
         }
 
         .left-column {
@@ -333,30 +343,31 @@ export function PresentationView({
         }
 
         .idea-title {
-          font-size: 42px;
+          font-size: 32px;
           font-weight: 700;
-          margin: 0 0 16px 0;
+          margin: 0 0 12px 0;
           color: white;
+          line-height: 1.2;
         }
 
         .idea-overview {
-          font-size: 18px;
+          font-size: 14px;
           line-height: 1.6;
           color: #aaa;
-          margin: 0 0 32px 0;
+          margin: 0 0 16px 0;
         }
 
         .section-label {
-          font-size: 12px;
+          font-size: 10px;
           text-transform: uppercase;
           letter-spacing: 2px;
           color: #0066FF;
-          margin: 0 0 12px 0;
+          margin: 0 0 8px 0;
           font-weight: 600;
         }
 
         .features-section {
-          margin-bottom: 24px;
+          margin-bottom: 16px;
         }
 
         .features-list {
@@ -367,20 +378,20 @@ export function PresentationView({
 
         .features-list li {
           position: relative;
-          padding-left: 20px;
-          margin-bottom: 8px;
-          font-size: 15px;
+          padding-left: 16px;
+          margin-bottom: 6px;
+          font-size: 13px;
           color: #ccc;
-          line-height: 1.5;
+          line-height: 1.4;
         }
 
         .features-list li::before {
           content: '';
           position: absolute;
           left: 0;
-          top: 8px;
-          width: 6px;
-          height: 6px;
+          top: 6px;
+          width: 5px;
+          height: 5px;
           background: #0066FF;
           border-radius: 50%;
         }
@@ -388,45 +399,45 @@ export function PresentationView({
         .brand-fit-section {
           background: rgba(0, 102, 255, 0.1);
           border: 1px solid rgba(0, 102, 255, 0.2);
-          border-radius: 12px;
-          padding: 20px;
+          border-radius: 8px;
+          padding: 12px 16px;
           margin-top: auto;
         }
 
         .brand-fit-text {
           margin: 0;
-          font-size: 15px;
+          font-size: 13px;
           color: #ddd;
-          line-height: 1.6;
+          line-height: 1.5;
         }
 
         .right-column {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 12px;
         }
 
         .image-placeholder {
           flex: 1;
           background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-          border-radius: 12px;
+          border-radius: 8px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          min-height: 200px;
+          min-height: 160px;
         }
 
         .placeholder-icon {
-          width: 64px;
-          height: 64px;
+          width: 48px;
+          height: 48px;
           color: #333;
-          margin-bottom: 12px;
+          margin-bottom: 8px;
         }
 
         .placeholder-label {
           color: #444;
-          font-size: 14px;
+          font-size: 12px;
           text-transform: uppercase;
           letter-spacing: 1px;
         }
@@ -434,12 +445,14 @@ export function PresentationView({
         .image-prompt {
           background: rgba(255, 255, 255, 0.05);
           border-radius: 8px;
-          padding: 16px;
+          padding: 12px;
+          max-height: 120px;
+          overflow-y: auto;
         }
 
         .image-prompt h4 {
-          margin: 0 0 8px 0;
-          font-size: 11px;
+          margin: 0 0 6px 0;
+          font-size: 10px;
           text-transform: uppercase;
           letter-spacing: 1px;
           color: #666;
@@ -447,9 +460,9 @@ export function PresentationView({
 
         .image-prompt p {
           margin: 0;
-          font-size: 12px;
+          font-size: 11px;
           color: #888;
-          line-height: 1.5;
+          line-height: 1.4;
           font-style: italic;
         }
 
@@ -458,6 +471,7 @@ export function PresentationView({
           justify-content: center;
           align-items: center;
           text-align: center;
+          padding: 48px 64px;
         }
 
         .end-content {
@@ -469,15 +483,15 @@ export function PresentationView({
         }
 
         .end-content h2 {
-          font-size: 64px;
+          font-size: 48px;
           font-weight: 700;
-          margin: 0 0 16px 0;
+          margin: 0 0 12px 0;
         }
 
         .end-subtitle {
-          font-size: 24px;
+          font-size: 20px;
           color: #888;
-          margin: 0 0 48px 0;
+          margin: 0 0 32px 0;
         }
 
         .end-meta {
@@ -485,11 +499,12 @@ export function PresentationView({
         }
 
         .end-meta p {
-          margin: 8px 0;
+          margin: 6px 0;
+          font-size: 14px;
         }
 
         .generated-date {
-          font-size: 14px;
+          font-size: 12px;
         }
       `}</style>
     </>
