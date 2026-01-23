@@ -11,6 +11,7 @@ export function IdeaMachineClient() {
   const [clients, setClients] = useState<Client[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [generatedIdeas, setGeneratedIdeas] = useState<Idea[]>([]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedProperties, setSelectedProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,6 +71,7 @@ export function IdeaMachineClient() {
 
       const result = await response.json();
       setGeneratedIdeas(result.ideas);
+      setSessionId(result.session_id);
       setSelectedClient(clients.find((c) => c.id === data.clientId) || null);
       setSelectedProperties(
         properties.filter((p) => data.propertyIds.includes(p.id))
@@ -83,14 +85,10 @@ export function IdeaMachineClient() {
 
   const handleReset = () => {
     setGeneratedIdeas([]);
+    setSessionId(null);
     setSelectedClient(null);
     setSelectedProperties([]);
     setError(null);
-  };
-
-  const handleExportToFigma = async () => {
-    // Will be implemented in Phase 4
-    console.log('Export to Figma - coming in Phase 4');
   };
 
   if (isLoading) {
@@ -120,8 +118,8 @@ export function IdeaMachineClient() {
           ideas={generatedIdeas}
           client={selectedClient}
           properties={selectedProperties}
+          sessionId={sessionId}
           onReset={handleReset}
-          onExportToFigma={handleExportToFigma}
         />
       ) : (
         <div className="bg-card-bg border border-card-border rounded-xl p-8 max-w-4xl mx-auto">
