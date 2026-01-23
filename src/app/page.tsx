@@ -1,3 +1,5 @@
+import { IdeaMachineClient } from './IdeaMachineClient';
+
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
@@ -31,16 +33,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Placeholder for form - will be built in Phase 2 */}
-          <div className="bg-card-bg border border-card-border rounded-xl p-8 max-w-4xl mx-auto">
-            <p className="text-muted text-center">
-              Idea generation form will be built in Phase 2.
-              <br />
-              <span className="text-sm">
-                Phase 1 complete: Project setup + Supabase schema + seed data
-              </span>
-            </p>
-          </div>
+          <IdeaMachineClient />
         </div>
       </main>
 
