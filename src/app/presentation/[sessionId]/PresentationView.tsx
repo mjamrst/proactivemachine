@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import type { Idea, Client, Property, IdeaSession } from '@/types/database';
 
 interface PresentationViewProps {
@@ -18,41 +18,122 @@ export function PresentationView({
 }: PresentationViewProps) {
   const presentationRef = useRef<HTMLDivElement>(null);
   const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
-  const [uploadedImages, setUploadedImages] = useState<Record<string, string>>({});
+
+  // Initialize with existing images from database
+  const [imageUrls, setImageUrls] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {};
+    ideas.forEach((idea) => {
+      if (idea.image_url) {
+        initial[idea.id] = idea.image_url;
+      }
+    });
+    return initial;
+  });
+
+  const [uploadingIds, setUploadingIds] = useState<Set<string>>(new Set());
+  const [errorMessages, setErrorMessages] = useState<Record<string, string>>({});
 
   const handlePrint = () => {
     window.print();
   };
 
   const handleImageClick = (ideaId: string) => {
+    if (uploadingIds.has(ideaId)) return;
     const input = fileInputRefs.current.get(ideaId);
     if (input) {
       input.click();
     }
   };
 
-  const handleImageUpload = (ideaId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = useCallback(async (ideaId: string, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setUploadedImages((prev) => ({
-        ...prev,
-        [ideaId]: imageUrl,
-      }));
-    }
-  };
+    if (!file) return;
 
-  const handleRemoveImage = (ideaId: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    setUploadedImages((prev) => {
-      const newImages = { ...prev };
-      if (newImages[ideaId]) {
-        URL.revokeObjectURL(newImages[ideaId]);
-        delete newImages[ideaId];
-      }
-      return newImages;
+    // Clear any previous error
+    setErrorMessages((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[ideaId];
+      return newErrors;
     });
-  };
+
+    // Show loading state
+    setUploadingIds((prev) => new Set(prev).add(ideaId));
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch(`/api/ideas/${ideaId}/image`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to upload image');
+      }
+
+      // Update state with the new image URL
+      setImageUrls((prev) => ({
+        ...prev,
+        [ideaId]: data.image_url,
+      }));
+    } catch (error) {
+      console.error('Upload error:', error);
+      setErrorMessages((prev) => ({
+        ...prev,
+        [ideaId]: error instanceof Error ? error.message : 'Upload failed',
+      }));
+    } finally {
+      setUploadingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(ideaId);
+        return newSet;
+      });
+      // Reset the input so the same file can be selected again
+      event.target.value = '';
+    }
+  }, []);
+
+  const handleRemoveImage = useCallback(async (ideaId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+
+    if (uploadingIds.has(ideaId)) return;
+
+    // Show loading state
+    setUploadingIds((prev) => new Set(prev).add(ideaId));
+
+    try {
+      const response = await fetch(`/api/ideas/${ideaId}/image`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to delete image');
+      }
+
+      // Remove from state
+      setImageUrls((prev) => {
+        const newUrls = { ...prev };
+        delete newUrls[ideaId];
+        return newUrls;
+      });
+    } catch (error) {
+      console.error('Delete error:', error);
+      setErrorMessages((prev) => ({
+        ...prev,
+        [ideaId]: error instanceof Error ? error.message : 'Delete failed',
+      }));
+    } finally {
+      setUploadingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(ideaId);
+        return newSet;
+      });
+    }
+  }, [uploadingIds]);
 
   const laneLabels: Record<string, string> = {
     live_experience: 'Live Experience',
@@ -152,13 +233,20 @@ export function PresentationView({
                     className="hidden-file-input"
                   />
                   <div
-                    className={`image-placeholder ${uploadedImages[idea.id] ? 'has-image' : ''}`}
+                    className={`image-placeholder ${imageUrls[idea.id] ? 'has-image' : ''} ${uploadingIds.has(idea.id) ? 'is-loading' : ''}`}
                     onClick={() => handleImageClick(idea.id)}
                   >
-                    {uploadedImages[idea.id] ? (
+                    {uploadingIds.has(idea.id) ? (
+                      <div className="loading-spinner">
+                        <svg className="spinner" viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" />
+                        </svg>
+                        <p className="loading-label">Uploading...</p>
+                      </div>
+                    ) : imageUrls[idea.id] ? (
                       <>
                         <img
-                          src={uploadedImages[idea.id]}
+                          src={imageUrls[idea.id]}
                           alt={idea.title}
                           className="uploaded-image"
                         />
@@ -183,6 +271,9 @@ export function PresentationView({
                           </svg>
                         </div>
                         <p className="placeholder-label">Click to upload image</p>
+                        {errorMessages[idea.id] && (
+                          <p className="error-message">{errorMessages[idea.id]}</p>
+                        )}
                       </>
                     )}
                   </div>
@@ -591,6 +682,48 @@ export function PresentationView({
 
         .image-placeholder:hover .placeholder-label {
           color: #0066FF;
+        }
+
+        .image-placeholder.is-loading {
+          cursor: wait;
+          pointer-events: none;
+        }
+
+        .loading-spinner {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .spinner {
+          width: 40px;
+          height: 40px;
+          color: #0066FF;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        .loading-label {
+          color: #666;
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .error-message {
+          color: #ef4444;
+          font-size: 11px;
+          margin-top: 8px;
+          text-align: center;
         }
 
         .image-prompt {

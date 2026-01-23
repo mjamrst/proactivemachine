@@ -62,6 +62,7 @@ export interface Idea {
   features: string[];
   brand_fit: string;
   image_prompt: string;
+  image_url: string | null;
   figma_frame_id: string | null;
   created_at: string;
 }
