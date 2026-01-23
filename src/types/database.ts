@@ -1,0 +1,129 @@
+// Database types for Idea Machine
+
+export type PropertyCategory =
+  | 'league'
+  | 'team'
+  | 'music_festival'
+  | 'entertainment'
+  | 'cultural_moment';
+
+export type IdeaLane =
+  | 'live_experience'
+  | 'digital'
+  | 'content';
+
+export type TechModifier = 'AI' | 'VR' | 'AR';
+
+export type ContentStyle =
+  | 'creator_led'
+  | 'talent_led'
+  | 'branded_content';
+
+// Database row types
+export interface Client {
+  id: string;
+  name: string;
+  created_at: string;
+}
+
+export interface Property {
+  id: string;
+  name: string;
+  category: PropertyCategory;
+  parent_id: string | null;
+  created_at: string;
+}
+
+export interface PropertyWithParent extends Property {
+  parent_name: string | null;
+}
+
+export interface IdeaSession {
+  id: string;
+  client_id: string;
+  property_ids: string[];
+  idea_lane: IdeaLane;
+  tech_modifiers: TechModifier[] | null;
+  content_style: ContentStyle | null;
+  num_ideas: number;
+  created_at: string;
+}
+
+export interface IdeaSessionWithDetails extends IdeaSession {
+  client_name: string;
+  ideas_count: number;
+}
+
+export interface Idea {
+  id: string;
+  session_id: string;
+  title: string;
+  overview: string;
+  features: string[];
+  brand_fit: string;
+  image_prompt: string;
+  figma_frame_id: string | null;
+  created_at: string;
+}
+
+// Insert types (without auto-generated fields)
+export interface ClientInsert {
+  name: string;
+}
+
+export interface PropertyInsert {
+  name: string;
+  category: PropertyCategory;
+  parent_id?: string | null;
+}
+
+export interface IdeaSessionInsert {
+  client_id: string;
+  property_ids: string[];
+  idea_lane: IdeaLane;
+  tech_modifiers?: TechModifier[] | null;
+  content_style?: ContentStyle | null;
+  num_ideas: number;
+}
+
+export interface IdeaInsert {
+  session_id: string;
+  title: string;
+  overview: string;
+  features: string[];
+  brand_fit: string;
+  image_prompt: string;
+  figma_frame_id?: string | null;
+}
+
+// Grouped properties for UI
+export interface PropertiesByCategory {
+  leagues: Property[];
+  teams: Property[];
+  music_festivals: Property[];
+  entertainment: Property[];
+  cultural_moments: Property[];
+}
+
+// API Response types
+export interface GenerateIdeasRequest {
+  client_id: string;
+  property_ids: string[];
+  idea_lane: IdeaLane;
+  tech_modifiers?: TechModifier[];
+  content_style?: ContentStyle;
+  num_ideas: number;
+}
+
+export interface GeneratedIdea {
+  title: string;
+  overview: string;
+  features: string[];
+  brand_fit: string;
+  image_prompt: string;
+}
+
+export interface GenerateIdeasResponse {
+  session_id: string;
+  ideas: Idea[];
+}
