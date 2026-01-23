@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { Idea, Client, Property, IdeaSession } from '@/types/database';
 
 interface PresentationViewProps {
@@ -17,9 +17,41 @@ export function PresentationView({
   session,
 }: PresentationViewProps) {
   const presentationRef = useRef<HTMLDivElement>(null);
+  const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
+  const [uploadedImages, setUploadedImages] = useState<Record<string, string>>({});
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleImageClick = (ideaId: string) => {
+    const input = fileInputRefs.current.get(ideaId);
+    if (input) {
+      input.click();
+    }
+  };
+
+  const handleImageUpload = (ideaId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setUploadedImages((prev) => ({
+        ...prev,
+        [ideaId]: imageUrl,
+      }));
+    }
+  };
+
+  const handleRemoveImage = (ideaId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setUploadedImages((prev) => {
+      const newImages = { ...prev };
+      if (newImages[ideaId]) {
+        URL.revokeObjectURL(newImages[ideaId]);
+        delete newImages[ideaId];
+      }
+      return newImages;
+    });
   };
 
   const laneLabels: Record<string, string> = {
@@ -110,13 +142,49 @@ export function PresentationView({
 
                 {/* Right Column - Image Prompt */}
                 <div className="right-column">
-                  <div className="image-placeholder">
-                    <div className="placeholder-icon">
-                      <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-                      </svg>
-                    </div>
-                    <p className="placeholder-label">Hero Image</p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={(el) => {
+                      if (el) fileInputRefs.current.set(idea.id, el);
+                    }}
+                    onChange={(e) => handleImageUpload(idea.id, e)}
+                    className="hidden-file-input"
+                  />
+                  <div
+                    className={`image-placeholder ${uploadedImages[idea.id] ? 'has-image' : ''}`}
+                    onClick={() => handleImageClick(idea.id)}
+                  >
+                    {uploadedImages[idea.id] ? (
+                      <>
+                        <img
+                          src={uploadedImages[idea.id]}
+                          alt={idea.title}
+                          className="uploaded-image"
+                        />
+                        <button
+                          className="remove-image-btn print:hidden"
+                          onClick={(e) => handleRemoveImage(idea.id, e)}
+                          title="Remove image"
+                        >
+                          <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                          </svg>
+                        </button>
+                        <div className="image-overlay print:hidden">
+                          <span>Click to replace</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="placeholder-icon">
+                          <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                          </svg>
+                        </div>
+                        <p className="placeholder-label">Click to upload image</p>
+                      </>
+                    )}
                   </div>
                   <div className="image-prompt">
                     <h4>Image Prompt:</h4>
@@ -417,6 +485,10 @@ export function PresentationView({
           gap: 12px;
         }
 
+        .hidden-file-input {
+          display: none;
+        }
+
         .image-placeholder {
           flex: 1;
           background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -426,6 +498,77 @@ export function PresentationView({
           align-items: center;
           justify-content: center;
           min-height: 160px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          position: relative;
+          overflow: hidden;
+          border: 2px dashed transparent;
+        }
+
+        .image-placeholder:hover {
+          border-color: #0066FF;
+          background: linear-gradient(135deg, #1a1a2e 0%, #1a2540 100%);
+        }
+
+        .image-placeholder.has-image {
+          border: none;
+          padding: 0;
+        }
+
+        .image-placeholder.has-image:hover .image-overlay {
+          opacity: 1;
+        }
+
+        .uploaded-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 8px;
+        }
+
+        .image-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.7);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+          border-radius: 8px;
+        }
+
+        .image-overlay span {
+          color: white;
+          font-size: 14px;
+          font-weight: 500;
+        }
+
+        .remove-image-btn {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          width: 28px;
+          height: 28px;
+          background: rgba(0, 0, 0, 0.7);
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+          transition: background 0.2s ease;
+        }
+
+        .remove-image-btn:hover {
+          background: rgba(220, 38, 38, 0.9);
+        }
+
+        .remove-image-btn svg {
+          width: 16px;
+          height: 16px;
+          color: white;
         }
 
         .placeholder-icon {
@@ -440,6 +583,14 @@ export function PresentationView({
           font-size: 12px;
           text-transform: uppercase;
           letter-spacing: 1px;
+        }
+
+        .image-placeholder:hover .placeholder-icon {
+          color: #0066FF;
+        }
+
+        .image-placeholder:hover .placeholder-label {
+          color: #0066FF;
         }
 
         .image-prompt {
