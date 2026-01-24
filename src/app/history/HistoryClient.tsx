@@ -18,12 +18,20 @@ interface HistoryClientProps {
   sessions: IdeaSessionWithDetails[];
 }
 
-export function HistoryClient({ sessions }: HistoryClientProps) {
+interface SessionsByClient {
+  [clientName: string]: IdeaSessionWithDetails[];
+}
+
+export function HistoryClient({ sessions: initialSessions }: HistoryClientProps) {
+  const [sessions, setSessions] = useState<IdeaSessionWithDetails[]>(initialSessions);
   const [filter, setFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState<string>('');
 
   // Debounced search
   const performSearch = useCallback(async (query: string) => {
@@ -65,6 +73,67 @@ export function HistoryClient({ sessions }: HistoryClientProps) {
   const filteredSessions = filter === 'all'
     ? sessions
     : sessions.filter(s => s.idea_lane === filter);
+
+  // Group sessions by client
+  const sessionsByClient: SessionsByClient = filteredSessions.reduce((acc, session) => {
+    const clientName = session.client_name;
+    if (!acc[clientName]) {
+      acc[clientName] = [];
+    }
+    acc[clientName].push(session);
+    return acc;
+  }, {} as SessionsByClient);
+
+  // Sort clients alphabetically
+  const sortedClients = Object.keys(sessionsByClient).sort((a, b) =>
+    a.toLowerCase().localeCompare(b.toLowerCase())
+  );
+
+  // Initialize all clients as expanded on first render
+  useEffect(() => {
+    if (expandedClients.size === 0 && sortedClients.length > 0) {
+      setExpandedClients(new Set(sortedClients));
+    }
+  }, [sortedClients, expandedClients.size]);
+
+  const toggleClient = (clientName: string) => {
+    setExpandedClients(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(clientName)) {
+        newSet.delete(clientName);
+      } else {
+        newSet.add(clientName);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSaveSessionName = async (sessionId: string) => {
+    try {
+      const response = await fetch(`/api/sessions/${sessionId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: editingName }),
+      });
+
+      if (response.ok) {
+        const { session: updatedSession } = await response.json();
+        setSessions(prev =>
+          prev.map(s => s.id === sessionId ? { ...s, name: updatedSession.name } : s)
+        );
+      }
+    } catch (error) {
+      console.error('Failed to update session name:', error);
+    } finally {
+      setEditingSessionId(null);
+      setEditingName('');
+    }
+  };
+
+  const startEditing = (session: IdeaSessionWithDetails) => {
+    setEditingSessionId(session.id);
+    setEditingName(session.name || '');
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -257,53 +326,141 @@ export function HistoryClient({ sessions }: HistoryClientProps) {
             })}
           </div>
 
-          {/* Sessions List */}
-          <div className="grid gap-4">
-            {filteredSessions.map((session) => (
-              <div
-                key={session.id}
-                className="bg-card-bg border border-card-border rounded-xl p-6 hover:border-muted transition-colors"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-foreground">
-                        {session.client_name}
-                      </h3>
-                      <span className="px-2 py-0.5 bg-accent/10 text-accent text-xs font-medium rounded">
-                        {laneLabels[session.idea_lane]}
-                      </span>
-                      {session.tech_modifiers && session.tech_modifiers.length > 0 && (
-                        <span className="px-2 py-0.5 bg-card-border text-muted text-xs rounded">
-                          {session.tech_modifiers.join(', ')}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-muted text-sm mb-2">
-                      {session.ideas_count} idea{session.ideas_count !== 1 ? 's' : ''} generated
-                    </p>
-                    <p className="text-muted text-xs">
-                      {formatDate(session.created_at)}
-                    </p>
+          {/* Sessions List - Grouped by Client */}
+          <div className="space-y-6">
+            {sortedClients.map((clientName) => (
+              <div key={clientName} className="bg-card-bg border border-card-border rounded-xl overflow-hidden">
+                {/* Client Header - Collapsible */}
+                <button
+                  onClick={() => toggleClient(clientName)}
+                  className="w-full flex items-center justify-between p-4 hover:bg-card-border/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <svg
+                      className={`w-5 h-5 text-muted transition-transform ${
+                        expandedClients.has(clientName) ? 'rotate-90' : ''
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    <h3 className="text-lg font-semibold text-foreground">{clientName}</h3>
+                    <span className="px-2 py-0.5 bg-accent/10 text-accent text-xs font-medium rounded">
+                      {sessionsByClient[clientName].length} session{sessionsByClient[clientName].length !== 1 ? 's' : ''}
+                    </span>
                   </div>
+                </button>
 
-                  <div className="flex gap-2">
-                    <a
-                      href={`/session/${session.id}`}
-                      className="px-4 py-2 bg-card-border text-foreground rounded-lg text-sm font-medium hover:bg-muted/20 transition-colors"
-                    >
-                      View Ideas
-                    </a>
-                    <a
-                      href={`/presentation/${session.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover transition-colors"
-                    >
-                      Presentation
-                    </a>
+                {/* Sessions for this client */}
+                {expandedClients.has(clientName) && (
+                  <div className="border-t border-card-border divide-y divide-card-border">
+                    {sessionsByClient[clientName].map((session) => (
+                      <div
+                        key={session.id}
+                        className="p-4 hover:bg-card-border/30 transition-colors"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="flex-1">
+                            {/* Session Name - Editable */}
+                            <div className="flex items-center gap-2 mb-2">
+                              {editingSessionId === session.id ? (
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    value={editingName}
+                                    onChange={(e) => setEditingName(e.target.value)}
+                                    placeholder="Enter session name..."
+                                    className="px-2 py-1 bg-background border border-card-border rounded text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+                                    autoFocus
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') handleSaveSessionName(session.id);
+                                      if (e.key === 'Escape') {
+                                        setEditingSessionId(null);
+                                        setEditingName('');
+                                      }
+                                    }}
+                                  />
+                                  <button
+                                    onClick={() => handleSaveSessionName(session.id)}
+                                    className="p-1 text-accent hover:text-accent-hover"
+                                    title="Save"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setEditingSessionId(null);
+                                      setEditingName('');
+                                    }}
+                                    className="p-1 text-muted hover:text-foreground"
+                                    title="Cancel"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-foreground">
+                                    {session.name || 'Untitled Session'}
+                                  </span>
+                                  <button
+                                    onClick={() => startEditing(session)}
+                                    className="p-1 text-muted hover:text-foreground"
+                                    title="Edit name"
+                                  >
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <span className="px-2 py-0.5 bg-accent/10 text-accent text-xs font-medium rounded">
+                                {laneLabels[session.idea_lane]}
+                              </span>
+                              {session.tech_modifiers && session.tech_modifiers.length > 0 && (
+                                <span className="px-2 py-0.5 bg-card-border text-muted text-xs rounded">
+                                  {session.tech_modifiers.join(', ')}
+                                </span>
+                              )}
+                              <span className="text-muted text-xs">
+                                {session.ideas_count} idea{session.ideas_count !== 1 ? 's' : ''}
+                              </span>
+                            </div>
+                            <p className="text-muted text-xs">
+                              {formatDate(session.created_at)}
+                            </p>
+                          </div>
+
+                          <div className="flex gap-2">
+                            <a
+                              href={`/session/${session.id}`}
+                              className="px-4 py-2 bg-card-border text-foreground rounded-lg text-sm font-medium hover:bg-muted/20 transition-colors"
+                            >
+                              View Ideas
+                            </a>
+                            <a
+                              href={`/presentation/${session.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover transition-colors"
+                            >
+                              Presentation
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
+                )}
               </div>
             ))}
           </div>

@@ -48,6 +48,7 @@ export interface IdeaSession {
   content_style: ContentStyle | null;
   num_ideas: number;
   user_id: string | null;
+  name: string | null;
   created_at: string;
 }
 
@@ -112,6 +113,7 @@ export interface IdeaSessionInsert {
   content_style?: ContentStyle | null;
   num_ideas: number;
   user_id?: string | null;
+  name?: string | null;
 }
 
 export interface IdeaInsert {
