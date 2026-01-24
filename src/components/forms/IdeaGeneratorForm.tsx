@@ -149,9 +149,9 @@ export function IdeaGeneratorForm({
 
       {/* Session Name */}
       <Section>
-        <label className="block text-sm font-medium text-foreground mb-2">
-          Session Name <span className="text-muted font-normal">(optional)</span>
-        </label>
+        <h3 className="text-lg font-semibold text-foreground mb-2">
+          Session Name <span className="text-muted font-normal text-sm">(optional)</span>
+        </h3>
         <input
           type="text"
           value={sessionName}

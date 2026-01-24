@@ -13,9 +13,7 @@ export function NumberOfIdeasSelector({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-foreground">
-        Number of Ideas
-      </label>
+      <h3 className="text-lg font-semibold text-foreground">Number of Ideas</h3>
       <div className="flex items-center gap-4">
         {/* Stepper */}
         <div className="flex items-center bg-card-bg border border-card-border rounded-lg">

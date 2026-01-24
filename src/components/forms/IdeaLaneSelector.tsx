@@ -180,9 +180,7 @@ export function IdeaLaneSelector({
     <div className="space-y-6">
       {/* Idea Lane Selection */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-foreground">
-          Idea Lane
-        </label>
+        <h3 className="text-lg font-semibold text-foreground">Idea Lane</h3>
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           {IDEA_LANES.map((lane) => {
             const isSelected = selectedLane === lane.value;
@@ -248,9 +246,9 @@ export function IdeaLaneSelector({
           {/* Tech Modifiers - multi-select, not shown for content */}
           {showTechModifiers && (
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-foreground">
-                Technology <span className="text-muted font-normal">(optional, select multiple)</span>
-              </label>
+              <h3 className="text-lg font-semibold text-foreground">
+                Technology <span className="text-muted font-normal text-sm">(optional, select multiple)</span>
+              </h3>
               <div className="flex flex-wrap gap-2">
                 {TECH_MODIFIERS.map((modifier) => (
                   <button
@@ -272,9 +270,9 @@ export function IdeaLaneSelector({
 
           {/* Audience Modifier - single select */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-foreground">
-              Audience <span className="text-muted font-normal">(optional)</span>
-            </label>
+            <h3 className="text-lg font-semibold text-foreground">
+              Audience <span className="text-muted font-normal text-sm">(optional)</span>
+            </h3>
             <div className="flex flex-wrap gap-2">
               {AUDIENCE_MODIFIERS.map((modifier) => (
                 <button
@@ -295,9 +293,9 @@ export function IdeaLaneSelector({
 
           {/* Platform Modifier - single select */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-foreground">
-              Platform <span className="text-muted font-normal">(optional)</span>
-            </label>
+            <h3 className="text-lg font-semibold text-foreground">
+              Platform <span className="text-muted font-normal text-sm">(optional)</span>
+            </h3>
             <div className="flex flex-wrap gap-2">
               {PLATFORM_MODIFIERS.map((modifier) => (
                 <button
@@ -318,9 +316,9 @@ export function IdeaLaneSelector({
 
           {/* Budget Tier - single select */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-foreground">
-              Budget <span className="text-muted font-normal">(optional)</span>
-            </label>
+            <h3 className="text-lg font-semibold text-foreground">
+              Budget <span className="text-muted font-normal text-sm">(optional)</span>
+            </h3>
             <div className="flex flex-wrap gap-2">
               {BUDGET_TIERS.map((tier) => (
                 <button

@@ -69,9 +69,7 @@ export function ClientSelector({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-foreground">
-        Client
-      </label>
+      <h3 className="text-lg font-semibold text-foreground">Client</h3>
 
       <div ref={dropdownRef} className="relative">
         {/* Trigger Button */}
