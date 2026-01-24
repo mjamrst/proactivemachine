@@ -19,15 +19,34 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     const { userId } = await params;
-    const { display_name, role, password } = await request.json();
+    const { display_name, first_name, last_name, office, role, password } = await request.json();
 
     const supabase = await createClient();
 
     // Build update object
-    const updates: Record<string, string> = {};
+    const updates: Record<string, string | null> = {};
 
-    if (display_name) {
+    if (display_name !== undefined) {
       updates.display_name = display_name.trim();
+    }
+
+    if (first_name !== undefined) {
+      updates.first_name = first_name?.trim() || null;
+    }
+
+    if (last_name !== undefined) {
+      updates.last_name = last_name?.trim() || null;
+    }
+
+    if (office !== undefined) {
+      const validOffices = ['LA', 'New York', 'Munich', 'UK', 'Singapore', 'Washington DC', 'Dallas'];
+      if (office && !validOffices.includes(office)) {
+        return NextResponse.json(
+          { error: 'Invalid office location' },
+          { status: 400 }
+        );
+      }
+      updates.office = office || null;
     }
 
     if (role && (role === 'admin' || role === 'user')) {
@@ -62,7 +81,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       .from('users')
       .update(updates)
       .eq('id', userId)
-      .select('id, username, display_name, role, created_at, last_login_at')
+      .select('id, username, display_name, first_name, last_name, office, role, avatar_url, created_at, last_login_at')
       .single();
 
     if (error) {

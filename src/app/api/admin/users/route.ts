@@ -18,7 +18,7 @@ export async function GET() {
 
     const { data: users, error } = await supabase
       .from('users')
-      .select('id, username, display_name, role, avatar_url, created_at, last_login_at')
+      .select('id, username, display_name, first_name, last_name, office, role, avatar_url, created_at, last_login_at')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { username, password, display_name, role } = await request.json();
+    const { username, password, display_name, first_name, last_name, office, role } = await request.json();
 
     if (!username || !password || !display_name) {
       return NextResponse.json(
@@ -59,6 +59,14 @@ export async function POST(request: NextRequest) {
     if (password.length < 6) {
       return NextResponse.json(
         { error: 'Password must be at least 6 characters' },
+        { status: 400 }
+      );
+    }
+
+    const validOffices = ['LA', 'New York', 'Munich', 'UK', 'Singapore', 'Washington DC', 'Dallas'];
+    if (office && !validOffices.includes(office)) {
+      return NextResponse.json(
+        { error: 'Invalid office location' },
         { status: 400 }
       );
     }
@@ -88,9 +96,12 @@ export async function POST(request: NextRequest) {
         username: username.toLowerCase().trim(),
         password_hash: passwordHash,
         display_name: display_name.trim(),
+        first_name: first_name?.trim() || null,
+        last_name: last_name?.trim() || null,
+        office: office || null,
         role: userRole,
       })
-      .select('id, username, display_name, role, avatar_url, created_at, last_login_at')
+      .select('id, username, display_name, first_name, last_name, office, role, avatar_url, created_at, last_login_at')
       .single();
 
     if (error) {

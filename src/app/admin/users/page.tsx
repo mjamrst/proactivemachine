@@ -3,10 +3,17 @@
 import { useState, useEffect } from 'react';
 import { Button, Input, Modal } from '@/components/ui';
 
+type Office = 'LA' | 'New York' | 'Munich' | 'UK' | 'Singapore' | 'Washington DC' | 'Dallas';
+
+const OFFICES: Office[] = ['LA', 'New York', 'Munich', 'UK', 'Singapore', 'Washington DC', 'Dallas'];
+
 interface User {
   id: string;
   username: string;
   display_name: string;
+  first_name: string | null;
+  last_name: string | null;
+  office: Office | null;
   role: 'admin' | 'user';
   avatar_url: string | null;
   created_at: string;
@@ -22,6 +29,9 @@ export default function UsersPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newUsername, setNewUsername] = useState('');
   const [newDisplayName, setNewDisplayName] = useState('');
+  const [newFirstName, setNewFirstName] = useState('');
+  const [newLastName, setNewLastName] = useState('');
+  const [newOffice, setNewOffice] = useState<Office | ''>('');
   const [newPassword, setNewPassword] = useState('');
   const [newRole, setNewRole] = useState<'user' | 'admin'>('user');
   const [isAdding, setIsAdding] = useState(false);
@@ -30,6 +40,9 @@ export default function UsersPage() {
   // Edit user modal
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [editDisplayName, setEditDisplayName] = useState('');
+  const [editFirstName, setEditFirstName] = useState('');
+  const [editLastName, setEditLastName] = useState('');
+  const [editOffice, setEditOffice] = useState<Office | ''>('');
   const [editPassword, setEditPassword] = useState('');
   const [editRole, setEditRole] = useState<'user' | 'admin'>('user');
   const [isEditing, setIsEditing] = useState(false);
@@ -62,7 +75,7 @@ export default function UsersPage() {
 
   const handleAddUser = async () => {
     if (!newUsername || !newDisplayName || !newPassword) {
-      setAddError('All fields are required');
+      setAddError('Username, display name, and password are required');
       return;
     }
 
@@ -76,6 +89,9 @@ export default function UsersPage() {
         body: JSON.stringify({
           username: newUsername,
           display_name: newDisplayName,
+          first_name: newFirstName || null,
+          last_name: newLastName || null,
+          office: newOffice || null,
           password: newPassword,
           role: newRole,
         }),
@@ -88,6 +104,9 @@ export default function UsersPage() {
         setIsAddModalOpen(false);
         setNewUsername('');
         setNewDisplayName('');
+        setNewFirstName('');
+        setNewLastName('');
+        setNewOffice('');
         setNewPassword('');
         setNewRole('user');
       } else {
@@ -107,9 +126,18 @@ export default function UsersPage() {
     setEditError('');
 
     try {
-      const updates: Record<string, string> = {};
+      const updates: Record<string, string | null> = {};
       if (editDisplayName !== editingUser.display_name) {
         updates.display_name = editDisplayName;
+      }
+      if (editFirstName !== (editingUser.first_name || '')) {
+        updates.first_name = editFirstName || null;
+      }
+      if (editLastName !== (editingUser.last_name || '')) {
+        updates.last_name = editLastName || null;
+      }
+      if (editOffice !== (editingUser.office || '')) {
+        updates.office = editOffice || null;
       }
       if (editRole !== editingUser.role) {
         updates.role = editRole;
@@ -233,6 +261,9 @@ export default function UsersPage() {
   const openEditModal = (user: User) => {
     setEditingUser(user);
     setEditDisplayName(user.display_name);
+    setEditFirstName(user.first_name || '');
+    setEditLastName(user.last_name || '');
+    setEditOffice(user.office || '');
     setEditRole(user.role);
     setEditPassword('');
     setEditError('');
@@ -282,8 +313,8 @@ export default function UsersPage() {
           <thead>
             <tr className="border-b border-card-border bg-card-border/30">
               <th className="text-left px-4 py-3 text-sm font-medium text-muted">User</th>
+              <th className="text-left px-4 py-3 text-sm font-medium text-muted">Office</th>
               <th className="text-left px-4 py-3 text-sm font-medium text-muted">Role</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-muted">Created</th>
               <th className="text-left px-4 py-3 text-sm font-medium text-muted">Last Login</th>
               <th className="text-right px-4 py-3 text-sm font-medium text-muted">Actions</th>
             </tr>
@@ -310,6 +341,9 @@ export default function UsersPage() {
                     </div>
                   </div>
                 </td>
+                <td className="px-4 py-3 text-sm text-muted">
+                  {user.office || '—'}
+                </td>
                 <td className="px-4 py-3">
                   <span
                     className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
@@ -320,9 +354,6 @@ export default function UsersPage() {
                   >
                     {user.role}
                   </span>
-                </td>
-                <td className="px-4 py-3 text-sm text-muted">
-                  {formatDate(user.created_at)}
                 </td>
                 <td className="px-4 py-3 text-sm text-muted">
                   {formatDate(user.last_login_at)}
@@ -360,6 +391,9 @@ export default function UsersPage() {
           setIsAddModalOpen(false);
           setNewUsername('');
           setNewDisplayName('');
+          setNewFirstName('');
+          setNewLastName('');
+          setNewOffice('');
           setNewPassword('');
           setNewRole('user');
           setAddError('');
@@ -380,6 +414,35 @@ export default function UsersPage() {
             value={newDisplayName}
             onChange={(e) => setNewDisplayName(e.target.value)}
           />
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="First Name"
+              placeholder="John"
+              value={newFirstName}
+              onChange={(e) => setNewFirstName(e.target.value)}
+            />
+            <Input
+              label="Last Name"
+              placeholder="Doe"
+              value={newLastName}
+              onChange={(e) => setNewLastName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Office
+            </label>
+            <select
+              value={newOffice}
+              onChange={(e) => setNewOffice(e.target.value as Office | '')}
+              className="w-full px-3 py-2 bg-card-bg border border-card-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+            >
+              <option value="">Select office...</option>
+              {OFFICES.map((office) => (
+                <option key={office} value={office}>{office}</option>
+              ))}
+            </select>
+          </div>
           <Input
             label="Password"
             type="password"
@@ -490,6 +553,35 @@ export default function UsersPage() {
             value={editDisplayName}
             onChange={(e) => setEditDisplayName(e.target.value)}
           />
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="First Name"
+              placeholder="John"
+              value={editFirstName}
+              onChange={(e) => setEditFirstName(e.target.value)}
+            />
+            <Input
+              label="Last Name"
+              placeholder="Doe"
+              value={editLastName}
+              onChange={(e) => setEditLastName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Office
+            </label>
+            <select
+              value={editOffice}
+              onChange={(e) => setEditOffice(e.target.value as Office | '')}
+              className="w-full px-3 py-2 bg-card-bg border border-card-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+            >
+              <option value="">Select office...</option>
+              {OFFICES.map((office) => (
+                <option key={office} value={office}>{office}</option>
+              ))}
+            </select>
+          </div>
           <Input
             label="New Password"
             type="password"
