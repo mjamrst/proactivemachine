@@ -12,6 +12,8 @@ import type {
   Idea,
   IdeaInsert,
   PropertiesByCategory,
+  ClientDocument,
+  SessionDocument,
 } from '@/types/database';
 
 // ============================================
@@ -232,4 +234,80 @@ export async function updateIdeaFigmaFrameId(
     .eq('id', ideaId);
 
   if (error) throw error;
+}
+
+// ============================================
+// CLIENT DOCUMENTS
+// ============================================
+
+export async function getClientDocuments(
+  supabase: SupabaseClient,
+  clientId: string
+): Promise<ClientDocument[]> {
+  const { data, error } = await supabase
+    .from('client_documents')
+    .select('*')
+    .eq('client_id', clientId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
+}
+
+export async function createClientDocument(
+  supabase: SupabaseClient,
+  document: Omit<ClientDocument, 'id' | 'created_at'>
+): Promise<ClientDocument> {
+  const { data, error } = await supabase
+    .from('client_documents')
+    .insert(document)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteClientDocument(
+  supabase: SupabaseClient,
+  documentId: string
+): Promise<void> {
+  const { error } = await supabase
+    .from('client_documents')
+    .delete()
+    .eq('id', documentId);
+
+  if (error) throw error;
+}
+
+// ============================================
+// SESSION DOCUMENTS
+// ============================================
+
+export async function getSessionDocuments(
+  supabase: SupabaseClient,
+  sessionId: string
+): Promise<SessionDocument[]> {
+  const { data, error } = await supabase
+    .from('session_documents')
+    .select('*')
+    .eq('session_id', sessionId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
+}
+
+export async function createSessionDocument(
+  supabase: SupabaseClient,
+  document: Omit<SessionDocument, 'id' | 'created_at'>
+): Promise<SessionDocument> {
+  const { data, error } = await supabase
+    .from('session_documents')
+    .insert(document)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
 }

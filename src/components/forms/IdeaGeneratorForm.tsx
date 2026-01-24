@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ClientSelector } from './ClientSelector';
 import { PropertySelector } from './PropertySelector';
 import { IdeaLaneSelector } from './IdeaLaneSelector';
 import { NumberOfIdeasSelector } from './NumberOfIdeasSelector';
+import { DocumentUploader } from './DocumentUploader';
 import { Button } from '@/components/ui';
-import type { Client, Property, IdeaLane, TechModifier, ContentStyle } from '@/types/database';
+import type { Client, Property, IdeaLane, TechModifier, ContentStyle, ClientDocument } from '@/types/database';
 
 interface IdeaGeneratorFormProps {
   clients: Client[];
@@ -23,6 +24,7 @@ export interface GenerateFormData {
   techModifiers: TechModifier[];
   contentStyle: ContentStyle | null;
   numIdeas: number;
+  sessionFiles: File[];
 }
 
 export function IdeaGeneratorForm({
@@ -39,6 +41,20 @@ export function IdeaGeneratorForm({
   const [contentStyle, setContentStyle] = useState<ContentStyle | null>(null);
   const [numIdeas, setNumIdeas] = useState(5);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [clientDocuments, setClientDocuments] = useState<ClientDocument[]>([]);
+  const [sessionFiles, setSessionFiles] = useState<File[]>([]);
+
+  // Fetch client documents when client changes
+  useEffect(() => {
+    if (selectedClientId) {
+      fetch(`/api/clients/${selectedClientId}/documents`)
+        .then((res) => res.json())
+        .then((data) => setClientDocuments(data.documents || []))
+        .catch(() => setClientDocuments([]));
+    } else {
+      setClientDocuments([]);
+    }
+  }, [selectedClientId]);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -75,6 +91,7 @@ export function IdeaGeneratorForm({
       techModifiers,
       contentStyle,
       numIdeas,
+      sessionFiles,
     });
   };
 
@@ -156,6 +173,18 @@ export function IdeaGeneratorForm({
 
       {/* Number of Ideas */}
       <NumberOfIdeasSelector value={numIdeas} onChange={setNumIdeas} />
+
+      {/* Document Uploader */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Reference Documents</h3>
+        <DocumentUploader
+          clientId={selectedClientId}
+          clientDocuments={clientDocuments}
+          onDocumentsChange={setClientDocuments}
+          sessionFiles={sessionFiles}
+          onSessionFilesChange={setSessionFiles}
+        />
+      </div>
 
       {/* Generate Button */}
       <div className="pt-4">

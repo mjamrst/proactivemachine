@@ -53,6 +53,7 @@ interface GenerateIdeasParams {
   techModifiers?: TechModifier[];
   contentStyle?: ContentStyle;
   numIdeas: number;
+  documentContext?: string;
 }
 
 function buildUserPrompt(params: GenerateIdeasParams): string {
@@ -63,6 +64,7 @@ function buildUserPrompt(params: GenerateIdeasParams): string {
     techModifiers,
     contentStyle,
     numIdeas,
+    documentContext,
   } = params;
 
   const laneLabels: Record<IdeaLane, string> = {
@@ -89,6 +91,11 @@ IDEA LANE: ${laneLabels[ideaLane]}`;
 
   if (contentStyle) {
     prompt += `\nCONTENT STYLE: ${contentStyleLabels[contentStyle]}`;
+  }
+
+  if (documentContext) {
+    prompt += `\n\n${documentContext}`;
+    prompt += `\n\nIMPORTANT: Use the information from the reference documents above to make ideas highly specific and relevant to the brand's current goals, campaigns, and challenges. The ideas should directly address the brief requirements if provided.`;
   }
 
   prompt += `

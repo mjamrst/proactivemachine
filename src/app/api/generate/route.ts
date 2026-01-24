@@ -4,27 +4,37 @@ import { generateIdeas } from '@/lib/claude';
 import {
   getClientById,
   getPropertiesByIds,
+  getClientDocuments,
   createIdeaSession,
   createIdeas,
 } from '@/lib/supabase/db';
+import {
+  extractTextFromBuffer,
+  extractTextFromUrl,
+  getSupportedFileType,
+  formatDocumentsForPrompt,
+  truncateText,
+} from '@/lib/documents';
 import type { IdeaLane, TechModifier, ContentStyle, IdeaInsert } from '@/types/database';
-
-interface GenerateRequest {
-  client_id: string;
-  property_ids: string[];
-  idea_lane: IdeaLane;
-  tech_modifiers?: TechModifier[];
-  content_style?: ContentStyle;
-  num_ideas: number;
-}
 
 export async function POST(request: NextRequest) {
   try {
-    const body: GenerateRequest = await request.json();
+    // Handle FormData
+    const formData = await request.formData();
+
+    const client_id = formData.get('client_id') as string;
+    const property_ids = JSON.parse(formData.get('property_ids') as string) as string[];
+    const idea_lane = formData.get('idea_lane') as IdeaLane;
+    const num_ideas = parseInt(formData.get('num_ideas') as string, 10);
+
+    const tech_modifiers_str = formData.get('tech_modifiers') as string | null;
+    const tech_modifiers = tech_modifiers_str ? JSON.parse(tech_modifiers_str) as TechModifier[] : undefined;
+
+    const content_style = formData.get('content_style') as ContentStyle | null;
+
+    const session_file_count = parseInt(formData.get('session_file_count') as string || '0', 10);
 
     // Validate required fields
-    const { client_id, property_ids, idea_lane, num_ideas } = body;
-
     if (!client_id || !property_ids || !idea_lane || !num_ideas) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -50,9 +60,10 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     // Fetch client and properties from database
-    const [client, properties] = await Promise.all([
+    const [client, properties, clientDocuments] = await Promise.all([
       getClientById(supabase, client_id),
       getPropertiesByIds(supabase, property_ids),
+      getClientDocuments(supabase, client_id),
     ]);
 
     if (!client) {
@@ -69,14 +80,62 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Process documents for context
+    const documentContents: Array<{ name: string; content: string }> = [];
+
+    // Extract text from client documents (stored in Supabase)
+    for (const doc of clientDocuments) {
+      try {
+        const fileType = getSupportedFileType(doc.name);
+        if (fileType) {
+          const text = await extractTextFromUrl(doc.file_url, fileType);
+          if (text) {
+            documentContents.push({
+              name: `[Brand Document] ${doc.name}`,
+              content: truncateText(text, 15000), // Limit per document
+            });
+          }
+        }
+      } catch (err) {
+        console.error(`Failed to extract text from client document ${doc.name}:`, err);
+      }
+    }
+
+    // Extract text from session files (uploaded with request)
+    for (let i = 0; i < session_file_count; i++) {
+      const file = formData.get(`session_file_${i}`) as File | null;
+      if (file) {
+        try {
+          const fileType = getSupportedFileType(file.name);
+          if (fileType) {
+            const arrayBuffer = await file.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            const text = await extractTextFromBuffer(buffer, fileType);
+            if (text) {
+              documentContents.push({
+                name: `[Campaign Brief] ${file.name}`,
+                content: truncateText(text, 20000), // Slightly larger for briefs
+              });
+            }
+          }
+        } catch (err) {
+          console.error(`Failed to extract text from session file ${file.name}:`, err);
+        }
+      }
+    }
+
+    // Format documents for prompt
+    const documentContext = formatDocumentsForPrompt(documentContents);
+
     // Generate ideas using Claude
     const generatedIdeas = await generateIdeas({
       clientName: client.name,
       propertyNames: properties.map((p) => p.name),
       ideaLane: idea_lane,
-      techModifiers: body.tech_modifiers,
-      contentStyle: body.content_style,
+      techModifiers: tech_modifiers,
+      contentStyle: content_style || undefined,
       numIdeas: num_ideas,
+      documentContext: documentContext || undefined,
     });
 
     // Create idea session in database
@@ -84,8 +143,8 @@ export async function POST(request: NextRequest) {
       client_id,
       property_ids,
       idea_lane,
-      tech_modifiers: body.tech_modifiers || null,
-      content_style: body.content_style || null,
+      tech_modifiers: tech_modifiers || null,
+      content_style: content_style || null,
       num_ideas,
     });
 

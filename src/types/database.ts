@@ -67,6 +67,26 @@ export interface Idea {
   created_at: string;
 }
 
+export interface ClientDocument {
+  id: string;
+  client_id: string;
+  name: string;
+  file_url: string;
+  file_type: string;
+  file_size: number;
+  created_at: string;
+}
+
+export interface SessionDocument {
+  id: string;
+  session_id: string;
+  name: string;
+  file_url: string;
+  file_type: string;
+  file_size: number;
+  created_at: string;
+}
+
 // Insert types (without auto-generated fields)
 export interface ClientInsert {
   name: string;
@@ -114,6 +134,7 @@ export interface GenerateIdeasRequest {
   tech_modifiers?: TechModifier[];
   content_style?: ContentStyle;
   num_ideas: number;
+  session_documents?: File[];
 }
 
 export interface GeneratedIdea {

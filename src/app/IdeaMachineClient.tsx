@@ -51,17 +51,28 @@ export function IdeaMachineClient() {
     setError(null);
 
     try {
+      // Use FormData to support file uploads
+      const formData = new FormData();
+      formData.append('client_id', data.clientId);
+      formData.append('property_ids', JSON.stringify(data.propertyIds));
+      formData.append('idea_lane', data.ideaLane);
+      if (data.techModifiers.length > 0) {
+        formData.append('tech_modifiers', JSON.stringify(data.techModifiers));
+      }
+      if (data.contentStyle) {
+        formData.append('content_style', data.contentStyle);
+      }
+      formData.append('num_ideas', data.numIdeas.toString());
+
+      // Append session files
+      data.sessionFiles.forEach((file, index) => {
+        formData.append(`session_file_${index}`, file);
+      });
+      formData.append('session_file_count', data.sessionFiles.length.toString());
+
       const response = await fetch('/api/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          client_id: data.clientId,
-          property_ids: data.propertyIds,
-          idea_lane: data.ideaLane,
-          tech_modifiers: data.techModifiers.length > 0 ? data.techModifiers : undefined,
-          content_style: data.contentStyle,
-          num_ideas: data.numIdeas,
-        }),
+        body: formData,
       });
 
       if (!response.ok) {
