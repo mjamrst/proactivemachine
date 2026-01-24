@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateIdeas } from '@/lib/claude';
+import { getAuthUser } from '@/lib/auth';
 import {
   getClientById,
   getPropertiesByIds,
@@ -138,6 +139,9 @@ export async function POST(request: NextRequest) {
       documentContext: documentContext || undefined,
     });
 
+    // Get current user
+    const authUser = await getAuthUser();
+
     // Create idea session in database
     const session = await createIdeaSession(supabase, {
       client_id,
@@ -146,6 +150,7 @@ export async function POST(request: NextRequest) {
       tech_modifiers: tech_modifiers || null,
       content_style: content_style || null,
       num_ideas,
+      user_id: authUser?.id || null,
     });
 
     // Save generated ideas to database

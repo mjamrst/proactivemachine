@@ -47,11 +47,15 @@ export interface IdeaSession {
   tech_modifiers: TechModifier[] | null;
   content_style: ContentStyle | null;
   num_ideas: number;
+  user_id: string | null;
   created_at: string;
 }
 
 export interface IdeaSessionWithDetails extends IdeaSession {
   client_name: string;
+  client_domain?: string | null;
+  username?: string | null;
+  user_display_name?: string | null;
   ideas_count: number;
 }
 
@@ -107,6 +111,7 @@ export interface IdeaSessionInsert {
   tech_modifiers?: TechModifier[] | null;
   content_style?: ContentStyle | null;
   num_ideas: number;
+  user_id?: string | null;
 }
 
 export interface IdeaInsert {

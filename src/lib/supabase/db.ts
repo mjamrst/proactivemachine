@@ -136,12 +136,19 @@ export async function getTeamsByLeague(
 // ============================================
 
 export async function getIdeaSessions(
-  supabase: SupabaseClient
+  supabase: SupabaseClient,
+  userId?: string | null
 ): Promise<IdeaSessionWithDetails[]> {
-  const { data, error } = await supabase
+  let query = supabase
     .from('idea_sessions_with_details')
     .select('*')
     .order('created_at', { ascending: false });
+
+  if (userId) {
+    query = query.eq('user_id', userId);
+  }
+
+  const { data, error } = await query;
 
   if (error) throw error;
   return data;

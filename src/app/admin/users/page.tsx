@@ -1,0 +1,444 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Button, Input, Modal } from '@/components/ui';
+
+interface User {
+  id: string;
+  username: string;
+  display_name: string;
+  role: 'admin' | 'user';
+  created_at: string;
+  last_login_at: string | null;
+}
+
+export default function UsersPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Add user modal
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [newDisplayName, setNewDisplayName] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newRole, setNewRole] = useState<'user' | 'admin'>('user');
+  const [isAdding, setIsAdding] = useState(false);
+  const [addError, setAddError] = useState('');
+
+  // Edit user modal
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editDisplayName, setEditDisplayName] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [editRole, setEditRole] = useState<'user' | 'admin'>('user');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editError, setEditError] = useState('');
+
+  // Delete confirmation
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('/api/admin/users');
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data.users);
+      } else {
+        setError('Failed to load users');
+      }
+    } catch {
+      setError('Failed to load users');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleAddUser = async () => {
+    if (!newUsername || !newDisplayName || !newPassword) {
+      setAddError('All fields are required');
+      return;
+    }
+
+    setIsAdding(true);
+    setAddError('');
+
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: newUsername,
+          display_name: newDisplayName,
+          password: newPassword,
+          role: newRole,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUsers((prev) => [data.user, ...prev]);
+        setIsAddModalOpen(false);
+        setNewUsername('');
+        setNewDisplayName('');
+        setNewPassword('');
+        setNewRole('user');
+      } else {
+        setAddError(data.error || 'Failed to add user');
+      }
+    } catch {
+      setAddError('Failed to add user');
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const handleEditUser = async () => {
+    if (!editingUser) return;
+
+    setIsEditing(true);
+    setEditError('');
+
+    try {
+      const updates: Record<string, string> = {};
+      if (editDisplayName !== editingUser.display_name) {
+        updates.display_name = editDisplayName;
+      }
+      if (editRole !== editingUser.role) {
+        updates.role = editRole;
+      }
+      if (editPassword) {
+        updates.password = editPassword;
+      }
+
+      if (Object.keys(updates).length === 0) {
+        setEditingUser(null);
+        return;
+      }
+
+      const response = await fetch(`/api/admin/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUsers((prev) =>
+          prev.map((u) => (u.id === editingUser.id ? data.user : u))
+        );
+        setEditingUser(null);
+      } else {
+        setEditError(data.error || 'Failed to update user');
+      }
+    } catch {
+      setEditError('Failed to update user');
+    } finally {
+      setIsEditing(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deletingUser) return;
+
+    setIsDeleting(true);
+
+    try {
+      const response = await fetch(`/api/admin/users/${deletingUser.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setUsers((prev) => prev.filter((u) => u.id !== deletingUser.id));
+        setDeletingUser(null);
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to delete user');
+      }
+    } catch {
+      setError('Failed to delete user');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const openEditModal = (user: User) => {
+    setEditingUser(user);
+    setEditDisplayName(user.display_name);
+    setEditRole(user.role);
+    setEditPassword('');
+    setEditError('');
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'Never';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-accent border-t-transparent" />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-semibold text-foreground">Users</h2>
+          <p className="text-sm text-muted">Manage user accounts and permissions</p>
+        </div>
+        <Button onClick={() => setIsAddModalOpen(true)}>
+          Add User
+        </Button>
+      </div>
+
+      {error && (
+        <div className="mb-4 p-4 bg-error/10 border border-error/20 rounded-lg">
+          <p className="text-error text-sm">{error}</p>
+        </div>
+      )}
+
+      {/* Users Table */}
+      <div className="bg-card-bg border border-card-border rounded-lg overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-card-border bg-card-border/30">
+              <th className="text-left px-4 py-3 text-sm font-medium text-muted">User</th>
+              <th className="text-left px-4 py-3 text-sm font-medium text-muted">Role</th>
+              <th className="text-left px-4 py-3 text-sm font-medium text-muted">Created</th>
+              <th className="text-left px-4 py-3 text-sm font-medium text-muted">Last Login</th>
+              <th className="text-right px-4 py-3 text-sm font-medium text-muted">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id} className="border-b border-card-border last:border-0">
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-sm font-medium">
+                      {user.display_name[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{user.display_name}</p>
+                      <p className="text-xs text-muted">@{user.username}</p>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                      user.role === 'admin'
+                        ? 'bg-accent/20 text-accent'
+                        : 'bg-card-border text-muted'
+                    }`}
+                  >
+                    {user.role}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-sm text-muted">
+                  {formatDate(user.created_at)}
+                </td>
+                <td className="px-4 py-3 text-sm text-muted">
+                  {formatDate(user.last_login_at)}
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <button
+                    onClick={() => openEditModal(user)}
+                    className="text-sm text-accent hover:underline mr-3"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => setDeletingUser(user)}
+                    className="text-sm text-error hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {users.length === 0 && (
+          <div className="text-center py-12 text-muted">
+            No users found
+          </div>
+        )}
+      </div>
+
+      {/* Add User Modal */}
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setNewUsername('');
+          setNewDisplayName('');
+          setNewPassword('');
+          setNewRole('user');
+          setAddError('');
+        }}
+        title="Add New User"
+      >
+        <div className="space-y-4">
+          <Input
+            label="Username"
+            placeholder="e.g., johndoe"
+            value={newUsername}
+            onChange={(e) => setNewUsername(e.target.value)}
+            autoFocus
+          />
+          <Input
+            label="Display Name"
+            placeholder="e.g., John Doe"
+            value={newDisplayName}
+            onChange={(e) => setNewDisplayName(e.target.value)}
+          />
+          <Input
+            label="Password"
+            type="password"
+            placeholder="Minimum 6 characters"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Role
+            </label>
+            <select
+              value={newRole}
+              onChange={(e) => setNewRole(e.target.value as 'user' | 'admin')}
+              className="w-full px-3 py-2 bg-card-bg border border-card-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+            >
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          {addError && (
+            <p className="text-error text-sm">{addError}</p>
+          )}
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setIsAddModalOpen(false);
+                setAddError('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleAddUser} isLoading={isAdding}>
+              Add User
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Edit User Modal */}
+      <Modal
+        isOpen={!!editingUser}
+        onClose={() => {
+          setEditingUser(null);
+          setEditError('');
+        }}
+        title="Edit User"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Username
+            </label>
+            <p className="text-muted">@{editingUser?.username}</p>
+          </div>
+          <Input
+            label="Display Name"
+            value={editDisplayName}
+            onChange={(e) => setEditDisplayName(e.target.value)}
+          />
+          <Input
+            label="New Password"
+            type="password"
+            placeholder="Leave blank to keep current"
+            value={editPassword}
+            onChange={(e) => setEditPassword(e.target.value)}
+          />
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Role
+            </label>
+            <select
+              value={editRole}
+              onChange={(e) => setEditRole(e.target.value as 'user' | 'admin')}
+              className="w-full px-3 py-2 bg-card-bg border border-card-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+            >
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          {editError && (
+            <p className="text-error text-sm">{editError}</p>
+          )}
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setEditingUser(null);
+                setEditError('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleEditUser} isLoading={isEditing}>
+              Save Changes
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={!!deletingUser}
+        onClose={() => setDeletingUser(null)}
+        title="Delete User"
+      >
+        <div className="space-y-4">
+          <p className="text-foreground">
+            Are you sure you want to delete <strong>{deletingUser?.display_name}</strong>?
+            This action cannot be undone.
+          </p>
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              variant="secondary"
+              onClick={() => setDeletingUser(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteUser}
+              isLoading={isDeleting}
+              className="bg-error hover:bg-error/90"
+            >
+              Delete
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+}

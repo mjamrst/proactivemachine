@@ -1,11 +1,16 @@
 import { createClient } from '@/lib/supabase/server';
 import { getIdeaSessions } from '@/lib/supabase/db';
+import { getAuthUser } from '@/lib/auth';
 import { HistoryClient } from './HistoryClient';
 import { Header } from '@/components/Header';
 
 export default async function HistoryPage() {
   const supabase = await createClient();
-  const sessions = await getIdeaSessions(supabase);
+  const user = await getAuthUser();
+
+  // Admins see all sessions, regular users only see their own
+  const userId = user?.role === 'admin' ? undefined : user?.id;
+  const sessions = await getIdeaSessions(supabase, userId);
 
   return (
     <div className="min-h-screen flex flex-col">
