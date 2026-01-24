@@ -11,11 +11,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">
-              Generate Sponsorship Activation Ideas
+              Generate Partnership Activation Ideas
             </h2>
             <p className="text-muted text-lg max-w-2xl mx-auto">
               Select a client, properties, and idea lane to generate creative
-              sponsorship activation concepts that export directly to Figma.
+              partnership activation concepts that export directly to Figma.
             </p>
           </div>
 
