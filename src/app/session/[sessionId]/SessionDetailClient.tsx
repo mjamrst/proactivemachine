@@ -1,6 +1,7 @@
 'use client';
 
 import { IdeaCard } from '@/components/IdeaCard';
+import { ClientLogo } from '@/components/ClientLogo';
 import { Button } from '@/components/ui';
 import type { IdeaSession, Idea, Client, Property } from '@/types/database';
 
@@ -49,9 +50,12 @@ export function SessionDetailClient({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            {client.name}
-          </h1>
+          <div className="flex items-center gap-3 mb-2">
+            <ClientLogo name={client.name} domain={client.domain} size="lg" />
+            <h1 className="text-3xl font-bold text-foreground">
+              {client.name}
+            </h1>
+          </div>
           <p className="text-muted mb-3">
             {properties.map((p) => p.name).join(' + ')}
           </p>
