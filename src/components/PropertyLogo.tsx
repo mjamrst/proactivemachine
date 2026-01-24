@@ -48,6 +48,98 @@ const NBA_TEAM_ABBREVS: Record<string, string> = {
   'Washington Wizards': 'wsh',
 };
 
+// MLB teams use ESPN CDN
+const MLB_TEAM_ABBREVS: Record<string, string> = {
+  'Arizona Diamondbacks': 'ari',
+  'Atlanta Braves': 'atl',
+  'Baltimore Orioles': 'bal',
+  'Boston Red Sox': 'bos',
+  'Chicago Cubs': 'chc',
+  'Chicago White Sox': 'chw',
+  'Cincinnati Reds': 'cin',
+  'Cleveland Guardians': 'cle',
+  'Colorado Rockies': 'col',
+  'Detroit Tigers': 'det',
+  'Houston Astros': 'hou',
+  'Kansas City Royals': 'kc',
+  'Los Angeles Angels': 'laa',
+  'Los Angeles Dodgers': 'lad',
+  'Miami Marlins': 'mia',
+  'Milwaukee Brewers': 'mil',
+  'Minnesota Twins': 'min',
+  'New York Mets': 'nym',
+  'New York Yankees': 'nyy',
+  'Oakland Athletics': 'oak',
+  'Philadelphia Phillies': 'phi',
+  'Pittsburgh Pirates': 'pit',
+  'San Diego Padres': 'sd',
+  'San Francisco Giants': 'sf',
+  'Seattle Mariners': 'sea',
+  'St. Louis Cardinals': 'stl',
+  'Tampa Bay Rays': 'tb',
+  'Texas Rangers': 'tex',
+  'Toronto Blue Jays': 'tor',
+  'Washington Nationals': 'wsh',
+};
+
+// NHL teams use ESPN CDN
+const NHL_TEAM_ABBREVS: Record<string, string> = {
+  'Anaheim Ducks': 'ana',
+  'Arizona Coyotes': 'ari',
+  'Boston Bruins': 'bos',
+  'Buffalo Sabres': 'buf',
+  'Calgary Flames': 'cgy',
+  'Carolina Hurricanes': 'car',
+  'Chicago Blackhawks': 'chi',
+  'Colorado Avalanche': 'col',
+  'Columbus Blue Jackets': 'cbj',
+  'Dallas Stars': 'dal',
+  'Detroit Red Wings': 'det',
+  'Edmonton Oilers': 'edm',
+  'Florida Panthers': 'fla',
+  'Los Angeles Kings': 'la',
+  'Minnesota Wild': 'min',
+  'Montreal Canadiens': 'mtl',
+  'Nashville Predators': 'nsh',
+  'New Jersey Devils': 'nj',
+  'New York Islanders': 'nyi',
+  'New York Rangers': 'nyr',
+  'Ottawa Senators': 'ott',
+  'Philadelphia Flyers': 'phi',
+  'Pittsburgh Penguins': 'pit',
+  'San Jose Sharks': 'sj',
+  'Seattle Kraken': 'sea',
+  'St. Louis Blues': 'stl',
+  'Tampa Bay Lightning': 'tb',
+  'Toronto Maple Leafs': 'tor',
+  'Vancouver Canucks': 'van',
+  'Vegas Golden Knights': 'vgk',
+  'Washington Capitals': 'wsh',
+  'Winnipeg Jets': 'wpg',
+};
+
+// F1 teams use Formula1 CDN
+const F1_TEAM_SLUGS: Record<string, string> = {
+  'Red Bull Racing': 'red-bull-racing',
+  'Red Bull': 'red-bull-racing',
+  'Ferrari': 'ferrari',
+  'Scuderia Ferrari': 'ferrari',
+  'Mercedes': 'mercedes',
+  'Mercedes-AMG': 'mercedes',
+  'McLaren': 'mclaren',
+  'Aston Martin': 'aston-martin',
+  'Alpine': 'alpine',
+  'Williams': 'williams',
+  'Racing Bulls': 'rb',
+  'RB': 'rb',
+  'AlphaTauri': 'rb',
+  'Haas': 'haas',
+  'Haas F1 Team': 'haas',
+  'Kick Sauber': 'kick-sauber',
+  'Sauber': 'kick-sauber',
+  'Alfa Romeo': 'kick-sauber',
+};
+
 // Mapping of property names to their domains for logo.dev
 const PROPERTY_DOMAINS: Record<string, string> = {
   // Leagues
@@ -307,8 +399,11 @@ const PROPERTY_DOMAINS: Record<string, string> = {
 export function PropertyLogo({ name, size = 'sm', className = '' }: PropertyLogoProps) {
   const [hasError, setHasError] = useState(false);
 
-  // Check if this is an NBA team first
+  // Check sports league teams first (they use ESPN/official CDNs)
   const nbaAbbrev = NBA_TEAM_ABBREVS[name];
+  const mlbAbbrev = MLB_TEAM_ABBREVS[name];
+  const nhlAbbrev = NHL_TEAM_ABBREVS[name];
+  const f1Slug = F1_TEAM_SLUGS[name];
 
   // Look up domain from mapping
   const domain = PROPERTY_DOMAINS[name];
@@ -321,12 +416,21 @@ export function PropertyLogo({ name, size = 'sm', className = '' }: PropertyLogo
     .toUpperCase()
     .slice(0, 2);
 
-  // Determine logo URL - use ESPN for NBA teams, logo.dev for others
+  // Determine logo URL - use ESPN for NBA/MLB/NHL, F1 CDN for F1, logo.dev for others
   let logoUrl: string | null = null;
 
   if (nbaAbbrev) {
     // Use ESPN CDN for NBA teams
     logoUrl = `https://a.espncdn.com/i/teamlogos/nba/500/${nbaAbbrev}.png`;
+  } else if (mlbAbbrev) {
+    // Use ESPN CDN for MLB teams
+    logoUrl = `https://a.espncdn.com/i/teamlogos/mlb/500/${mlbAbbrev}.png`;
+  } else if (nhlAbbrev) {
+    // Use ESPN CDN for NHL teams
+    logoUrl = `https://a.espncdn.com/i/teamlogos/nhl/500/${nhlAbbrev}.png`;
+  } else if (f1Slug) {
+    // Use F1 official CDN for F1 teams
+    logoUrl = `https://media.formula1.com/content/dam/fom-website/teams/2024/${f1Slug}-logo.png`;
   } else {
     // Use logo.dev API for other properties
     const apiToken = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
