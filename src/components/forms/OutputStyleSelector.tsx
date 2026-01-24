@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import type { OutputStyleType, OutputStyle } from '@/types/database';
 
 interface OutputStyleSelectorProps {
@@ -10,7 +11,7 @@ interface OutputStyleSelectorProps {
 interface StyleProfile {
   type: OutputStyleType;
   name: string;
-  emoji: string;
+  image: string;
   description: string;
   color: string;
 }
@@ -19,49 +20,49 @@ const STYLE_PROFILES: StyleProfile[] = [
   {
     type: 'generic',
     name: 'No Sauce',
-    emoji: '🍽️',
+    image: '/characters/no_sauce_character.png',
     description: 'Clean, professional output - no special flavor added',
     color: 'from-gray-500 to-slate-500',
   },
   {
     type: 'techbro',
     name: 'Tech Bro',
-    emoji: '🚀',
+    image: '/characters/tech_bro_character.png',
     description: 'Tech-forward language, startup vibes, disruption-focused',
     color: 'from-blue-500 to-cyan-500',
   },
   {
     type: 'creative_strategist',
     name: 'Creative Strategist',
-    emoji: '✨',
+    image: '/characters/creative_strategist_character.png',
     description: 'Inspirational, creative wordplay, big-picture thinking',
     color: 'from-purple-500 to-pink-500',
   },
   {
     type: 'gen_z',
     name: 'Gen Z Coded',
-    emoji: '💅',
+    image: '/characters/gen_z_coded_character.png',
     description: 'Casual slang, no cap, very much giving main character energy',
     color: 'from-yellow-500 to-orange-500',
   },
   {
     type: 'sports_expert',
     name: 'Sports Expert',
-    emoji: '🏆',
+    image: '/characters/sports_expert_character.png',
     description: 'Athlete references, team history, sports metaphors galore',
     color: 'from-green-500 to-emerald-500',
   },
   {
     type: 'world_traveler',
     name: 'World Traveler',
-    emoji: '🌍',
+    image: '/characters/world_traveler_character.png',
     description: 'Global perspective, cultural insights, international appeal',
     color: 'from-indigo-500 to-violet-500',
   },
   {
     type: 'data_nerd',
     name: 'Data Nerd',
-    emoji: '📊',
+    image: '/characters/data_nerd_character.png',
     description: 'Analytical, stats-driven, backs up every claim with data',
     color: 'from-teal-500 to-cyan-500',
   },
@@ -121,7 +122,14 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
               )}
 
               <div className="flex items-start gap-3">
-                <span className="text-2xl">{profile.emoji}</span>
+                <div className="w-10 h-10 relative flex-shrink-0">
+                  <Image
+                    src={profile.image}
+                    alt={profile.name}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
                 <div className="flex-1 min-w-0">
                   <h4 className={`font-semibold truncate ${isSelected ? 'text-accent' : 'text-foreground'}`}>
                     {profile.name}
@@ -150,7 +158,14 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
         <div className="mt-6 p-4 bg-card-border/30 rounded-xl space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xl">{selectedProfile.emoji}</span>
+              <div className="w-8 h-8 relative flex-shrink-0">
+                <Image
+                  src={selectedProfile.image}
+                  alt={selectedProfile.name}
+                  fill
+                  className="object-contain"
+                />
+              </div>
               <span className="font-medium text-foreground">{selectedProfile.name} Intensity</span>
             </div>
             <span className={`px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r ${selectedProfile.color} text-white`}>
