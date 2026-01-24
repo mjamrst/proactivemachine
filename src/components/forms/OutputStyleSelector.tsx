@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import type { OutputStyleType, OutputStyle } from '@/types/database';
 
 interface OutputStyleSelectorProps {
@@ -64,8 +64,6 @@ const INTENSITY_LABELS = [
 
 export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const sliderRef = useRef<HTMLDivElement>(null);
 
   const handleSelectStyle = (type: OutputStyleType) => {
     if (value?.type === type) {
@@ -161,44 +159,19 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
           </div>
 
           {/* Custom Slider */}
-          <div className="relative pt-2 pb-1" ref={sliderRef}>
-            {/* Track container with padding for thumb overflow */}
-            <div className="relative h-8 flex items-center px-3">
+          <div className="relative pt-2 pb-1">
+            {/* Styled Range Slider */}
+            <div className="relative h-7 flex items-center">
               {/* Track background */}
-              <div className="absolute left-3 right-3 h-3 bg-card-border rounded-full overflow-hidden shadow-inner">
+              <div className="absolute inset-x-0 h-3 bg-card-border rounded-full">
                 {/* Filled track */}
                 <div
-                  className={`h-full bg-gradient-to-r ${selectedProfile.color} transition-all ${isDragging ? 'duration-0' : 'duration-150'}`}
+                  className={`h-full bg-gradient-to-r ${selectedProfile.color} rounded-full transition-all duration-150`}
                   style={{ width: `${((value.intensity - 1) / 4) * 100}%` }}
                 />
               </div>
 
-              {/* Draggable Thumb */}
-              <div
-                className="absolute h-3"
-                style={{
-                  left: `calc(${((value.intensity - 1) / 4) * 100}% * (100% - 24px) / 100% + 12px)`,
-                  width: 'calc(100% - 24px)',
-                }}
-              >
-                <div
-                  className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all ${isDragging ? 'duration-0' : 'duration-150'}`}
-                  style={{ left: `${((value.intensity - 1) / 4) * 100}%` }}
-                >
-                  <div
-                    className={`w-7 h-7 rounded-full bg-gradient-to-br ${selectedProfile.color} shadow-lg border-4 border-white dark:border-gray-800 transition-transform ${
-                      isDragging ? 'scale-125 shadow-xl' : 'hover:scale-110'
-                    }`}
-                    style={{
-                      boxShadow: isDragging
-                        ? '0 0 20px rgba(var(--accent-rgb, 59, 130, 246), 0.5), 0 4px 12px rgba(0,0,0,0.3)'
-                        : '0 2px 8px rgba(0,0,0,0.2)',
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Invisible range input for accessibility and drag handling */}
+              {/* Native range input with custom styling */}
               <input
                 type="range"
                 min="1"
@@ -206,28 +179,22 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
                 step="1"
                 value={value.intensity}
                 onChange={(e) => handleIntensityChange(parseInt(e.target.value))}
-                onMouseDown={() => setIsDragging(true)}
-                onMouseUp={() => setIsDragging(false)}
-                onMouseLeave={() => setIsDragging(false)}
-                onTouchStart={() => setIsDragging(true)}
-                onTouchEnd={() => setIsDragging(false)}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-grab active:cursor-grabbing z-10"
-                style={{ margin: 0 }}
+                className="intensity-slider relative w-full h-7 cursor-grab active:cursor-grabbing"
               />
             </div>
 
-            {/* Tick marks and labels */}
-            <div className="flex justify-between px-3 mt-1">
+            {/* Labels below */}
+            <div className="flex justify-between mt-3">
               {INTENSITY_LABELS.map((label) => (
                 <button
                   key={label.value}
                   type="button"
                   onClick={() => handleIntensityChange(label.value)}
                   className={`flex flex-col items-center transition-all ${
-                    value.intensity === label.value ? 'text-foreground scale-110' : 'text-muted hover:text-foreground'
+                    value.intensity === label.value ? 'text-foreground' : 'text-muted hover:text-foreground'
                   }`}
                 >
-                  <div className={`w-1.5 h-1.5 rounded-full mb-1 transition-all ${
+                  <div className={`w-2 h-2 rounded-full mb-1 transition-all ${
                     value.intensity >= label.value
                       ? `bg-gradient-to-r ${selectedProfile.color}`
                       : 'bg-card-border'
