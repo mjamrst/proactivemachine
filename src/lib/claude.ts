@@ -118,6 +118,17 @@ const OUTPUT_STYLE_PROMPTS: Record<OutputStyleType, { name: string; base: string
       'Deep global perspective - discuss cultural nuances across continents, reference international events and holidays, consider localization.',
       'Full globetrotter mode: Every idea should feel like it was conceived on a flight between continents. Reference specific cities, cultural practices, international trends, and global movements. Think UNESCO meets Madison Avenue.'
     ]
+  },
+  data_nerd: {
+    name: 'Data Nerd',
+    base: 'Write with an analytical, data-driven perspective. Research and include relevant statistics, market data, and industry insights to support each idea. Back up claims with numbers and cite data points that demonstrate why an idea will work.',
+    intensifiers: [
+      'Include a few relevant statistics or data points to support your ideas.',
+      'Weave in market research, industry stats, and relevant metrics. Reference consumer behavior data and trends.',
+      'Be analytical and rigorous. Include specific percentages, growth rates, market sizes, and audience demographics. Cite industry reports and research findings.',
+      'Go deep into the data. Reference specific studies, surveys, and analytics. Include ROI projections, engagement benchmarks, and comparative performance metrics. Think like a strategist presenting to a data-savvy CMO.',
+      'Full analytics mode: Every claim should be backed by data. Include specific statistics (e.g., "73% of Gen Z consumers..."), market valuations, YoY growth rates, engagement metrics, conversion benchmarks, and industry research. Reference sources like Nielsen, Statista, eMarketer, and league-specific data. Make the business case undeniable with numbers.'
+    ]
   }
 };
 

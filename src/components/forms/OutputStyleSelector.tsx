@@ -59,6 +59,13 @@ const STYLE_PROFILES: StyleProfile[] = [
     description: 'Global perspective, cultural insights, international appeal',
     color: 'from-indigo-500 to-violet-500',
   },
+  {
+    type: 'data_nerd',
+    name: 'Data Nerd',
+    emoji: '📊',
+    description: 'Analytical, stats-driven, backs up every claim with data',
+    color: 'from-teal-500 to-cyan-500',
+  },
 ];
 
 const INTENSITY_LABELS = [

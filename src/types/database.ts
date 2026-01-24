@@ -25,7 +25,8 @@ export type OutputStyleType =
   | 'creative_strategist'
   | 'gen_z'
   | 'sports_expert'
-  | 'world_traveler';
+  | 'world_traveler'
+  | 'data_nerd';
 
 export interface OutputStyle {
   type: OutputStyleType;
