@@ -19,6 +19,18 @@ export type ContentStyle =
   | 'talent_led'
   | 'branded_content';
 
+export type OutputStyleType =
+  | 'techbro'
+  | 'creative_strategist'
+  | 'gen_z'
+  | 'sports_expert'
+  | 'world_traveler';
+
+export interface OutputStyle {
+  type: OutputStyleType;
+  intensity: number; // 1-5
+}
+
 // Database row types
 export interface Client {
   id: string;

@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type { GeneratedIdea, IdeaLane, TechModifier, ContentStyle } from '@/types/database';
+import type { GeneratedIdea, IdeaLane, TechModifier, ContentStyle, OutputStyle, OutputStyleType } from '@/types/database';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -54,7 +54,67 @@ interface GenerateIdeasParams {
   contentStyle?: ContentStyle;
   numIdeas: number;
   documentContext?: string;
+  outputStyle?: OutputStyle;
 }
+
+// Output style personality prompts with intensity levels
+const OUTPUT_STYLE_PROMPTS: Record<OutputStyleType, { name: string; base: string; intensifiers: string[] }> = {
+  techbro: {
+    name: 'Techbro',
+    base: 'Write with a tech-forward perspective. Use startup and technology terminology. Focus on disruption, scalability, and innovation.',
+    intensifiers: [
+      'Lightly incorporate tech terminology where relevant.',
+      'Use tech industry language and reference emerging technologies.',
+      'Heavily lean into startup culture - talk about disrupting, scaling, 10x-ing. Reference specific technologies and platforms.',
+      'Go full Silicon Valley - mention Series A potential, talk about moats and flywheels, reference specific tech stacks and platforms like they\'re common knowledge.',
+      'Maximum techbro mode: Every idea should sound like a pitch deck. Use terms like "paradigm shift," "first-mover advantage," "network effects," and "vertical integration." Reference specific APIs, protocols, and tech infrastructure.'
+    ]
+  },
+  creative_strategist: {
+    name: 'Creative Strategist',
+    base: 'Write with an inspirational, creative flair. Use evocative language and paint vivid pictures. Think big-picture and strategic.',
+    intensifiers: [
+      'Add subtle creative flourishes to your writing.',
+      'Use more evocative, inspirational language. Paint pictures with words.',
+      'Write like a top creative director - use powerful metaphors, unexpected word combinations, and inspire action.',
+      'Channel your inner Don Draper. Every sentence should feel quotable. Use rhetorical devices, create tension and release.',
+      'Full creative manifesto mode: Write like you\'re crafting the next iconic campaign. Use poetic devices, create narrative arcs within each idea, make people feel something profound.'
+    ]
+  },
+  gen_z: {
+    name: 'Gen Z',
+    base: 'Write in a casual, Gen Z style. Use current slang naturally. Keep it authentic and relatable without trying too hard.',
+    intensifiers: [
+      'Keep the tone casual and approachable with occasional modern phrases.',
+      'Use Gen Z expressions naturally - "no cap," "it\'s giving," etc. Be conversational.',
+      'Lean into the vibe. Use slang freely, reference memes and internet culture, keep it real.',
+      'Very much giving main character energy. Use heavy slang, reference TikTok trends, be chronically online.',
+      'Full unhinged Gen Z mode: The way these ideas are absolutely serving? No cap, it\'s giving innovation, it\'s giving cultural reset, the girlies are gonna eat this up. Slay.'
+    ]
+  },
+  sports_expert: {
+    name: 'Sports Expert',
+    base: 'Write with deep sports knowledge. Reference specific athletes, teams, historic moments, and use sports metaphors throughout.',
+    intensifiers: [
+      'Include relevant sports references and athlete mentions.',
+      'Weave in specific team and athlete references. Use sports metaphors to illustrate points.',
+      'Show off your sports knowledge - reference historic games, legendary athletes, team rivalries. Every idea should feel rooted in sports culture.',
+      'Go deep into sports history. Reference specific plays, stats, and moments. Name-drop athletes from different eras. Use insider terminology.',
+      'Full sports encyclopedia mode: Reference specific game dates, jersey numbers, career stats. Compare ideas to legendary plays. Mention athletes from the \'80s through today. You should sound like you could win any sports trivia night.'
+    ]
+  },
+  world_traveler: {
+    name: 'World Traveler',
+    base: 'Write with a global perspective. Consider international audiences, cultural nuances, and worldwide relevance.',
+    intensifiers: [
+      'Consider how ideas might resonate across different cultures.',
+      'Think globally - reference international markets and cultural considerations.',
+      'Frame every idea with worldwide appeal. Reference specific regions, cultural traditions, and global trends.',
+      'Deep global perspective - discuss cultural nuances across continents, reference international events and holidays, consider localization.',
+      'Full globetrotter mode: Every idea should feel like it was conceived on a flight between continents. Reference specific cities, cultural practices, international trends, and global movements. Think UNESCO meets Madison Avenue.'
+    ]
+  }
+};
 
 function buildUserPrompt(params: GenerateIdeasParams): string {
   const {
@@ -65,6 +125,7 @@ function buildUserPrompt(params: GenerateIdeasParams): string {
     contentStyle,
     numIdeas,
     documentContext,
+    outputStyle,
   } = params;
 
   const laneLabels: Record<IdeaLane, string> = {
@@ -96,6 +157,19 @@ IDEA LANE: ${laneLabels[ideaLane]}`;
   if (documentContext) {
     prompt += `\n\n${documentContext}`;
     prompt += `\n\nIMPORTANT: Use the information from the reference documents above to make ideas highly specific and relevant to the brand's current goals, campaigns, and challenges. The ideas should directly address the brief requirements if provided.`;
+  }
+
+  // Add output style instructions if specified
+  if (outputStyle) {
+    const styleConfig = OUTPUT_STYLE_PROMPTS[outputStyle.type];
+    const intensityIndex = Math.min(outputStyle.intensity - 1, styleConfig.intensifiers.length - 1);
+    const intensityPrompt = styleConfig.intensifiers[intensityIndex];
+
+    prompt += `\n\nOUTPUT STYLE: ${styleConfig.name}
+${styleConfig.base}
+${intensityPrompt}
+
+Apply this style consistently throughout all ideas - in the titles, overviews, features, and brand fit sections.`;
   }
 
   prompt += `

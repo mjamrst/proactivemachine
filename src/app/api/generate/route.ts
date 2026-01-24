@@ -16,7 +16,7 @@ import {
   formatDocumentsForPrompt,
   truncateText,
 } from '@/lib/documents';
-import type { IdeaLane, TechModifier, ContentStyle, IdeaInsert } from '@/types/database';
+import type { IdeaLane, TechModifier, ContentStyle, IdeaInsert, OutputStyle } from '@/types/database';
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,6 +33,9 @@ export async function POST(request: NextRequest) {
     const tech_modifiers = tech_modifiers_str ? JSON.parse(tech_modifiers_str) as TechModifier[] : undefined;
 
     const content_style = formData.get('content_style') as ContentStyle | null;
+
+    const output_style_str = formData.get('output_style') as string | null;
+    const output_style = output_style_str ? JSON.parse(output_style_str) as OutputStyle : undefined;
 
     const session_file_count = parseInt(formData.get('session_file_count') as string || '0', 10);
 
@@ -138,6 +141,7 @@ export async function POST(request: NextRequest) {
       contentStyle: content_style || undefined,
       numIdeas: num_ideas,
       documentContext: documentContext || undefined,
+      outputStyle: output_style,
     });
 
     // Get current user

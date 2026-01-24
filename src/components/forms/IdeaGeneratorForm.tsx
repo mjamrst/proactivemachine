@@ -5,9 +5,10 @@ import { ClientSelector } from './ClientSelector';
 import { PropertySelector } from './PropertySelector';
 import { IdeaLaneSelector } from './IdeaLaneSelector';
 import { NumberOfIdeasSelector } from './NumberOfIdeasSelector';
+import { OutputStyleSelector } from './OutputStyleSelector';
 import { DocumentUploader } from './DocumentUploader';
 import { Button } from '@/components/ui';
-import type { Client, Property, IdeaLane, TechModifier, ContentStyle, ClientDocument } from '@/types/database';
+import type { Client, Property, IdeaLane, TechModifier, ContentStyle, ClientDocument, OutputStyle } from '@/types/database';
 
 interface IdeaGeneratorFormProps {
   clients: Client[];
@@ -25,6 +26,7 @@ export interface GenerateFormData {
   techModifiers: TechModifier[];
   contentStyle: ContentStyle | null;
   numIdeas: number;
+  outputStyle: OutputStyle | null;
   sessionFiles: File[];
 }
 
@@ -42,6 +44,7 @@ export function IdeaGeneratorForm({
   const [techModifiers, setTechModifiers] = useState<TechModifier[]>([]);
   const [contentStyle, setContentStyle] = useState<ContentStyle | null>(null);
   const [numIdeas, setNumIdeas] = useState(5);
+  const [outputStyle, setOutputStyle] = useState<OutputStyle | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [clientDocuments, setClientDocuments] = useState<ClientDocument[]>([]);
   const [sessionFiles, setSessionFiles] = useState<File[]>([]);
@@ -94,6 +97,7 @@ export function IdeaGeneratorForm({
       techModifiers,
       contentStyle,
       numIdeas,
+      outputStyle,
       sessionFiles,
     });
   };
@@ -193,6 +197,9 @@ export function IdeaGeneratorForm({
 
       {/* Number of Ideas */}
       <NumberOfIdeasSelector value={numIdeas} onChange={setNumIdeas} />
+
+      {/* Output Style */}
+      <OutputStyleSelector value={outputStyle} onChange={setOutputStyle} />
 
       {/* Document Uploader */}
       <div>

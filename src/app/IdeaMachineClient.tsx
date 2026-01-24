@@ -66,6 +66,9 @@ export function IdeaMachineClient() {
         formData.append('content_style', data.contentStyle);
       }
       formData.append('num_ideas', data.numIdeas.toString());
+      if (data.outputStyle) {
+        formData.append('output_style', JSON.stringify(data.outputStyle));
+      }
 
       // Append session files
       data.sessionFiles.forEach((file, index) => {
