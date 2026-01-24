@@ -143,9 +143,9 @@ export function IdeaMachineClient() {
           onUpdateIdea={handleUpdateIdea}
         />
       ) : (
-        <div className="bg-card-bg border border-card-border rounded-xl p-8 max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {error && (
-            <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-lg">
+            <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl">
               <p className="text-error text-sm">{error}</p>
             </div>
           )}

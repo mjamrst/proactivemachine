@@ -3,7 +3,7 @@ import { Header } from '@/components/Header';
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#f7f7f5]">
       <Header currentPage="home" />
 
       {/* Main Content */}
