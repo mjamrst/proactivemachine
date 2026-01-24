@@ -1,4 +1,5 @@
 import { SettingsClient } from './SettingsClient';
+import { Header } from '@/components/Header';
 
 export default function SettingsPage() {
   // Check which services are configured (server-side)
@@ -7,22 +8,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="border-b border-card-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <a href="/" className="text-2xl font-bold">
-            <span className="text-accent">Idea</span> Machine
-          </a>
-          <nav className="flex gap-4">
-            <a href="/settings" className="text-accent font-medium">
-              Settings
-            </a>
-            <a href="/history" className="text-muted hover:text-foreground transition-colors">
-              History
-            </a>
-          </nav>
-        </div>
-      </header>
+      <Header currentPage="settings" />
 
       {/* Main Content */}
       <main className="flex-1 px-6 py-8">

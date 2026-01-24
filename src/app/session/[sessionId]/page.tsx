@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getIdeaSessionById, getIdeasBySession, getClientById, getPropertiesByIds } from '@/lib/supabase/db';
 import { notFound } from 'next/navigation';
 import { SessionDetailClient } from './SessionDetailClient';
+import { Header } from '@/components/Header';
 
 interface PageProps {
   params: Promise<{ sessionId: string }>;
@@ -28,22 +29,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="border-b border-card-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <a href="/" className="text-2xl font-bold">
-            <span className="text-accent">Idea</span> Machine
-          </a>
-          <nav className="flex gap-4">
-            <a href="/settings" className="text-muted hover:text-foreground transition-colors">
-              Settings
-            </a>
-            <a href="/history" className="text-muted hover:text-foreground transition-colors">
-              History
-            </a>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="flex-1 px-6 py-8">
