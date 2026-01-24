@@ -27,6 +27,11 @@ const IDEA_LANES: { value: IdeaLane; label: string; description: string }[] = [
     label: 'Content',
     description: 'Video series, podcasts, branded entertainment',
   },
+  {
+    value: 'social_impact',
+    label: 'Social Impact',
+    description: 'Corporate responsibility, sustainability, community engagement',
+  },
 ];
 
 const TECH_MODIFIERS: { value: TechModifier; label: string }[] = [
@@ -61,7 +66,7 @@ export function IdeaLaneSelector({
   contentStyle,
   onContentStyleChange,
 }: IdeaLaneSelectorProps) {
-  const showTechModifiers = selectedLane === 'live_experience' || selectedLane === 'digital';
+  const showTechModifiers = selectedLane === 'live_experience' || selectedLane === 'digital' || selectedLane === 'social_impact';
   const showContentStyle = selectedLane === 'content';
 
   const toggleTechModifier = (modifier: TechModifier) => {

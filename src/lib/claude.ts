@@ -44,6 +44,17 @@ Features:
 Brand Fit: Aligns the financial brand with entrepreneurial ambition and the creator economy, reaching a younger demographic through authentic voices.
 Image Prompt: Photorealistic image of a stylish brunch setting with diverse young creators and athletes in conversation, podcast microphones on tables, modern industrial venue, NBA All-Star branding visible, warm lighting, aspirational but accessible vibe
 
+EXAMPLE 3: Client: Major Auto Brand | Property: MLS | Lane: Social Impact
+Title: "Green Goals"
+Overview: A comprehensive sustainability initiative that plants trees for every goal scored across MLS, while converting stadium parking lots into urban green spaces and EV charging hubs. Demonstrates the auto brand's commitment to sustainable transportation and environmental stewardship through the passion of soccer fandom.
+Features:
+- Tree planting tracker displayed on stadium screens and app showing real-time environmental impact
+- "Green Lot" pilot program transforming three MLS stadium parking areas into tree-lined EV charging parks
+- Youth soccer clinics in underserved communities with sustainability education curriculum
+- Carbon offset program for away fan travel with brand-sponsored credits
+Brand Fit: Connects the auto brand's EV and sustainability commitments to passionate fan communities, creating tangible environmental impact while positioning for the future of transportation.
+Image Prompt: Photorealistic image of a transformed stadium parking area with trees, green spaces, and modern EV charging stations, diverse families and soccer fans walking through, MLS stadium visible in background, sunny day, hopeful and forward-looking atmosphere
+
 IMPORTANT: Return your response as a valid JSON array. Each object must have these exact keys: title, overview, features (array of strings), brand_fit, image_prompt`;
 
 interface GenerateIdeasParams {
@@ -148,6 +159,7 @@ function buildUserPrompt(params: GenerateIdeasParams): string {
     live_experience: 'Live Experience',
     digital: 'Digital',
     content: 'Content',
+    social_impact: 'Social Impact',
   };
 
   const contentStyleLabels: Record<ContentStyle, string> = {
@@ -168,6 +180,20 @@ IDEA LANE: ${laneLabels[ideaLane]}`;
 
   if (contentStyle) {
     prompt += `\nCONTENT STYLE: ${contentStyleLabels[contentStyle]}`;
+  }
+
+  // Add Social Impact lane specific guidance
+  if (ideaLane === 'social_impact') {
+    prompt += `\n\nSOCIAL IMPACT FOCUS: These ideas should center on corporate responsibility, sustainability, and community engagement. Consider how the brand can authentically address societal challenges such as:
+- Climate change and environmental sustainability
+- Social justice, equity, and inclusion
+- Community development and economic empowerment
+- Education and workforce development
+- The future of work and technology's role in society
+- Health and wellness initiatives
+- Youth development and mentorship
+
+Ideas should demonstrate meaningful brand commitment (not just cause marketing), create tangible community benefit, and leverage the property partnership to amplify social good. Think about how the brand can show up as a force for positive change while maintaining authenticity.`;
   }
 
   if (documentContext) {

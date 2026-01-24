@@ -10,7 +10,8 @@ export type PropertyCategory =
 export type IdeaLane =
   | 'live_experience'
   | 'digital'
-  | 'content';
+  | 'content'
+  | 'social_impact';
 
 export type TechModifier = 'AI' | 'VR' | 'AR';
 
