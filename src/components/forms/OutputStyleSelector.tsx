@@ -152,8 +152,8 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
         })}
       </div>
 
-      {/* Intensity Slider - Only show when a style is selected */}
-      {value && selectedProfile && (
+      {/* Intensity Slider - Only show when a style is selected (not for No Sauce) */}
+      {value && selectedProfile && value.type !== 'generic' && (
         <div className="mt-6 p-4 bg-card-border/30 rounded-xl space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
