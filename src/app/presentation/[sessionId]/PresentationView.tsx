@@ -139,6 +139,7 @@ export function PresentationView({
     live_experience: 'Live Experience',
     digital: 'Digital',
     content: 'Content',
+    social_impact: 'Social Impact',
   };
 
   return (

@@ -22,6 +22,7 @@ export function SessionDetailClient({
     live_experience: 'Live Experience',
     digital: 'Digital',
     content: 'Content',
+    social_impact: 'Social Impact',
   };
 
   const formatDate = (dateString: string) => {
