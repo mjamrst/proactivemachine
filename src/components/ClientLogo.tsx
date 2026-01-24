@@ -15,14 +15,8 @@ const sizeClasses = {
   lg: 'w-10 h-10',
 };
 
-const sizePx = {
-  sm: 20,
-  md: 32,
-  lg: 40,
-};
-
 export function ClientLogo({ domain, name, size = 'md', className = '' }: ClientLogoProps) {
-  const [sourceIndex, setSourceIndex] = useState(0);
+  const [hasError, setHasError] = useState(false);
 
   // Generate initials for fallback
   const initials = name
@@ -32,29 +26,13 @@ export function ClientLogo({ domain, name, size = 'md', className = '' }: Client
     .toUpperCase()
     .slice(0, 2);
 
-  // Try multiple logo sources in order of quality
-  const logoSources = domain
-    ? [
-        // Google's high-res favicon service
-        `https://www.google.com/s2/favicons?domain=${domain}&sz=${sizePx[size] * 2}`,
-        // DuckDuckGo icons
-        `https://icons.duckduckgo.com/ip3/${domain}.ico`,
-        // Direct favicon from site
-        `https://${domain}/favicon.ico`,
-      ]
-    : [];
+  // Use logo.dev API for high-quality logos
+  const apiToken = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
+  const logoUrl = domain && apiToken
+    ? `https://img.logo.dev/${domain}?token=${apiToken}&size=128&format=png`
+    : null;
 
-  const currentLogo = logoSources[sourceIndex];
-
-  const handleError = () => {
-    if (sourceIndex < logoSources.length - 1) {
-      setSourceIndex(sourceIndex + 1);
-    } else {
-      setSourceIndex(-1); // All sources failed, show initials
-    }
-  };
-
-  if (!domain || sourceIndex === -1 || logoSources.length === 0) {
+  if (!logoUrl || hasError) {
     // Fallback to initials
     return (
       <div
@@ -68,10 +46,10 @@ export function ClientLogo({ domain, name, size = 'md', className = '' }: Client
 
   return (
     <img
-      src={currentLogo}
+      src={logoUrl}
       alt={`${name} logo`}
       className={`${sizeClasses[size]} ${className} rounded-md object-contain bg-white p-0.5 flex-shrink-0`}
-      onError={handleError}
+      onError={() => setHasError(true)}
     />
   );
 }
