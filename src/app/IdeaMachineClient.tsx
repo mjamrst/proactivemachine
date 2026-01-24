@@ -108,6 +108,12 @@ export function IdeaMachineClient() {
     setError(null);
   };
 
+  const handleUpdateIdea = (updatedIdea: Idea) => {
+    setGeneratedIdeas((prev) =>
+      prev.map((idea) => (idea.id === updatedIdea.id ? updatedIdea : idea))
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -137,6 +143,7 @@ export function IdeaMachineClient() {
           properties={selectedProperties}
           sessionId={sessionId}
           onReset={handleReset}
+          onUpdateIdea={handleUpdateIdea}
         />
       ) : (
         <div className="bg-card-bg border border-card-border rounded-xl p-8 max-w-4xl mx-auto">

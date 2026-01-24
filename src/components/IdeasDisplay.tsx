@@ -10,6 +10,7 @@ interface IdeasDisplayProps {
   properties: Property[];
   sessionId: string | null;
   onReset: () => void;
+  onUpdateIdea?: (updatedIdea: Idea) => void;
 }
 
 export function IdeasDisplay({
@@ -18,6 +19,7 @@ export function IdeasDisplay({
   properties,
   sessionId,
   onReset,
+  onUpdateIdea,
 }: IdeasDisplayProps) {
   if (ideas.length === 0) return null;
 
@@ -68,7 +70,7 @@ export function IdeasDisplay({
       {/* Ideas Grid */}
       <div className="grid gap-6">
         {ideas.map((idea, index) => (
-          <IdeaCard key={idea.id} idea={idea} index={index} />
+          <IdeaCard key={idea.id} idea={idea} index={index} onUpdate={onUpdateIdea} />
         ))}
       </div>
     </div>
