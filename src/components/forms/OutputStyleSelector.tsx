@@ -26,7 +26,7 @@ const STYLE_PROFILES: StyleProfile[] = [
   },
   {
     type: 'techbro',
-    name: 'Techbro',
+    name: 'Tech Bro',
     emoji: '🚀',
     description: 'Tech-forward language, startup vibes, disruption-focused',
     color: 'from-blue-500 to-cyan-500',

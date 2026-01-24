@@ -65,7 +65,7 @@ const OUTPUT_STYLE_PROMPTS: Record<OutputStyleType, { name: string; base: string
     intensifiers: ['', '', '', '', '']
   },
   techbro: {
-    name: 'Techbro',
+    name: 'Tech Bro',
     base: 'Write with a tech-forward perspective. Use startup and technology terminology. Focus on disruption, scalability, and innovation.',
     intensifiers: [
       'Lightly incorporate tech terminology where relevant.',
