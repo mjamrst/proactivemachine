@@ -14,6 +14,40 @@ const sizeClasses = {
   lg: 'w-8 h-8',
 };
 
+// NBA teams use ESPN CDN - mapping team names to ESPN abbreviations
+const NBA_TEAM_ABBREVS: Record<string, string> = {
+  'Atlanta Hawks': 'atl',
+  'Boston Celtics': 'bos',
+  'Brooklyn Nets': 'bkn',
+  'Charlotte Hornets': 'cha',
+  'Chicago Bulls': 'chi',
+  'Cleveland Cavaliers': 'cle',
+  'Dallas Mavericks': 'dal',
+  'Denver Nuggets': 'den',
+  'Detroit Pistons': 'det',
+  'Golden State Warriors': 'gs',
+  'Houston Rockets': 'hou',
+  'Indiana Pacers': 'ind',
+  'Los Angeles Clippers': 'lac',
+  'Los Angeles Lakers': 'lal',
+  'Memphis Grizzlies': 'mem',
+  'Miami Heat': 'mia',
+  'Milwaukee Bucks': 'mil',
+  'Minnesota Timberwolves': 'min',
+  'New Orleans Pelicans': 'no',
+  'New York Knicks': 'ny',
+  'Oklahoma City Thunder': 'okc',
+  'Orlando Magic': 'orl',
+  'Philadelphia 76ers': 'phi',
+  'Phoenix Suns': 'phx',
+  'Portland Trail Blazers': 'por',
+  'Sacramento Kings': 'sac',
+  'San Antonio Spurs': 'sa',
+  'Toronto Raptors': 'tor',
+  'Utah Jazz': 'utah',
+  'Washington Wizards': 'wsh',
+};
+
 // Mapping of property names to their domains for logo.dev
 const PROPERTY_DOMAINS: Record<string, string> = {
   // Leagues
@@ -273,6 +307,9 @@ const PROPERTY_DOMAINS: Record<string, string> = {
 export function PropertyLogo({ name, size = 'sm', className = '' }: PropertyLogoProps) {
   const [hasError, setHasError] = useState(false);
 
+  // Check if this is an NBA team first
+  const nbaAbbrev = NBA_TEAM_ABBREVS[name];
+
   // Look up domain from mapping
   const domain = PROPERTY_DOMAINS[name];
 
@@ -284,11 +321,19 @@ export function PropertyLogo({ name, size = 'sm', className = '' }: PropertyLogo
     .toUpperCase()
     .slice(0, 2);
 
-  // Use logo.dev API
-  const apiToken = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
-  const logoUrl = domain && apiToken
-    ? `https://img.logo.dev/${domain}?token=${apiToken}&size=64&format=png`
-    : null;
+  // Determine logo URL - use ESPN for NBA teams, logo.dev for others
+  let logoUrl: string | null = null;
+
+  if (nbaAbbrev) {
+    // Use ESPN CDN for NBA teams
+    logoUrl = `https://a.espncdn.com/i/teamlogos/nba/500/${nbaAbbrev}.png`;
+  } else {
+    // Use logo.dev API for other properties
+    const apiToken = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN;
+    logoUrl = domain && apiToken
+      ? `https://img.logo.dev/${domain}?token=${apiToken}&size=64&format=png`
+      : null;
+  }
 
   if (!logoUrl || hasError) {
     // Fallback to initials
