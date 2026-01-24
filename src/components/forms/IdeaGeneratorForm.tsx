@@ -8,7 +8,7 @@ import { NumberOfIdeasSelector } from './NumberOfIdeasSelector';
 import { OutputStyleSelector } from './OutputStyleSelector';
 import { DocumentUploader } from './DocumentUploader';
 import { Button } from '@/components/ui';
-import type { Client, Property, IdeaLane, TechModifier, ContentStyle, ClientDocument, OutputStyle } from '@/types/database';
+import type { Client, Property, IdeaLane, TechModifier, ClientDocument, OutputStyle } from '@/types/database';
 
 interface IdeaGeneratorFormProps {
   clients: Client[];
@@ -24,7 +24,6 @@ export interface GenerateFormData {
   propertyIds: string[];
   ideaLane: IdeaLane;
   techModifiers: TechModifier[];
-  contentStyle: ContentStyle | null;
   numIdeas: number;
   outputStyle: OutputStyle | null;
   sessionFiles: File[];
@@ -42,7 +41,6 @@ export function IdeaGeneratorForm({
   const [selectedPropertyIds, setSelectedPropertyIds] = useState<string[]>([]);
   const [selectedLane, setSelectedLane] = useState<IdeaLane | null>(null);
   const [techModifiers, setTechModifiers] = useState<TechModifier[]>([]);
-  const [contentStyle, setContentStyle] = useState<ContentStyle | null>(null);
   const [numIdeas, setNumIdeas] = useState(5);
   const [outputStyle, setOutputStyle] = useState<OutputStyle | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -76,10 +74,6 @@ export function IdeaGeneratorForm({
       newErrors.lane = 'Please select an idea lane';
     }
 
-    if (selectedLane === 'content' && !contentStyle) {
-      newErrors.contentStyle = 'Please select a content style';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -95,7 +89,6 @@ export function IdeaGeneratorForm({
       propertyIds: selectedPropertyIds,
       ideaLane: selectedLane!,
       techModifiers,
-      contentStyle,
       numIdeas,
       outputStyle,
       sessionFiles,
@@ -104,15 +97,13 @@ export function IdeaGeneratorForm({
 
   const handleLaneChange = (lane: IdeaLane) => {
     setSelectedLane(lane);
-    // Reset modifiers when changing lanes
+    // Reset tech modifiers when switching to content lane (no tech modifiers for content)
     if (lane === 'content') {
       setTechModifiers([]);
-    } else {
-      setContentStyle(null);
     }
     // Clear lane-related errors
     setErrors((prev) => {
-      const { lane: _l, contentStyle: _c, ...rest } = prev;
+      const { lane: _l, ...rest } = prev;
       return rest;
     });
   };
@@ -180,19 +171,8 @@ export function IdeaGeneratorForm({
           onLaneChange={handleLaneChange}
           techModifiers={techModifiers}
           onTechModifiersChange={setTechModifiers}
-          contentStyle={contentStyle}
-          onContentStyleChange={(style) => {
-            setContentStyle(style);
-            setErrors((prev) => {
-              const { contentStyle: _, ...rest } = prev;
-              return rest;
-            });
-          }}
         />
         {errors.lane && <p className="mt-1 text-sm text-error">{errors.lane}</p>}
-        {errors.contentStyle && (
-          <p className="mt-1 text-sm text-error">{errors.contentStyle}</p>
-        )}
       </div>
 
       {/* Number of Ideas */}

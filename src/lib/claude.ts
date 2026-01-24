@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type { GeneratedIdea, IdeaLane, TechModifier, ContentStyle, OutputStyle, OutputStyleType } from '@/types/database';
+import type { GeneratedIdea, IdeaLane, TechModifier, OutputStyle, OutputStyleType } from '@/types/database';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -62,7 +62,6 @@ interface GenerateIdeasParams {
   propertyNames: string[];
   ideaLane: IdeaLane;
   techModifiers?: TechModifier[];
-  contentStyle?: ContentStyle;
   numIdeas: number;
   documentContext?: string;
   outputStyle?: OutputStyle;
@@ -149,7 +148,6 @@ function buildUserPrompt(params: GenerateIdeasParams): string {
     propertyNames,
     ideaLane,
     techModifiers,
-    contentStyle,
     numIdeas,
     documentContext,
     outputStyle,
@@ -160,12 +158,10 @@ function buildUserPrompt(params: GenerateIdeasParams): string {
     digital: 'Digital',
     content: 'Content',
     social_impact: 'Social Impact',
-  };
-
-  const contentStyleLabels: Record<ContentStyle, string> = {
-    creator_led: 'Creator-Led',
-    talent_led: 'Talent-Led',
-    branded_content: 'Branded Content',
+    talent_athlete: 'Talent/Athlete',
+    gaming_esports: 'Gaming/Esports',
+    hospitality_vip: 'Hospitality/VIP',
+    retail_product: 'Retail/Product',
   };
 
   let prompt = `Generate ${numIdeas} distinct sponsorship activation ideas for:
@@ -176,10 +172,6 @@ IDEA LANE: ${laneLabels[ideaLane]}`;
 
   if (techModifiers && techModifiers.length > 0) {
     prompt += `\nTECHNOLOGY FOCUS: ${techModifiers.join(', ')}`;
-  }
-
-  if (contentStyle) {
-    prompt += `\nCONTENT STYLE: ${contentStyleLabels[contentStyle]}`;
   }
 
   // Add Social Impact lane specific guidance

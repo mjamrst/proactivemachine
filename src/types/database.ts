@@ -11,7 +11,11 @@ export type IdeaLane =
   | 'live_experience'
   | 'digital'
   | 'content'
-  | 'social_impact';
+  | 'social_impact'
+  | 'talent_athlete'
+  | 'gaming_esports'
+  | 'hospitality_vip'
+  | 'retail_product';
 
 export type TechModifier = 'AI' | 'VR' | 'AR';
 

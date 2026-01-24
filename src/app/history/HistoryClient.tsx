@@ -70,6 +70,10 @@ export function HistoryClient({ sessions: initialSessions }: HistoryClientProps)
     digital: 'Digital',
     content: 'Content',
     social_impact: 'Social Impact',
+    talent_athlete: 'Talent/Athlete',
+    gaming_esports: 'Gaming/Esports',
+    hospitality_vip: 'Hospitality/VIP',
+    retail_product: 'Retail/Product',
   };
 
   const filteredSessions = filter === 'all'
@@ -309,7 +313,7 @@ export function HistoryClient({ sessions: initialSessions }: HistoryClientProps)
             >
               All ({sessions.length})
             </button>
-            {['live_experience', 'digital', 'content', 'social_impact'].map((lane) => {
+            {['live_experience', 'digital', 'content', 'social_impact', 'talent_athlete', 'gaming_esports', 'hospitality_vip', 'retail_product'].map((lane) => {
               const count = sessions.filter(s => s.idea_lane === lane).length;
               if (count === 0) return null;
               return (

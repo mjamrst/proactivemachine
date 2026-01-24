@@ -140,6 +140,10 @@ export function PresentationView({
     digital: 'Digital',
     content: 'Content',
     social_impact: 'Social Impact',
+    talent_athlete: 'Talent/Athlete',
+    gaming_esports: 'Gaming/Esports',
+    hospitality_vip: 'Hospitality/VIP',
+    retail_product: 'Retail/Product',
   };
 
   return (

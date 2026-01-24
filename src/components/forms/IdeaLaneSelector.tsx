@@ -1,14 +1,12 @@
 'use client';
 
-import type { IdeaLane, TechModifier, ContentStyle } from '@/types/database';
+import type { IdeaLane, TechModifier } from '@/types/database';
 
 interface IdeaLaneSelectorProps {
   selectedLane: IdeaLane | null;
   onLaneChange: (lane: IdeaLane) => void;
   techModifiers: TechModifier[];
   onTechModifiersChange: (modifiers: TechModifier[]) => void;
-  contentStyle: ContentStyle | null;
-  onContentStyleChange: (style: ContentStyle) => void;
 }
 
 const IDEA_LANES: { value: IdeaLane; label: string; description: string }[] = [
@@ -32,6 +30,26 @@ const IDEA_LANES: { value: IdeaLane; label: string; description: string }[] = [
     label: 'Social Impact',
     description: 'Corporate responsibility, sustainability, community engagement',
   },
+  {
+    value: 'talent_athlete',
+    label: 'Talent/Athlete',
+    description: 'Ambassador programs, endorsements, athlete appearances, player-driven storytelling',
+  },
+  {
+    value: 'gaming_esports',
+    label: 'Gaming/Esports',
+    description: 'In-game integrations, streaming partnerships, esports sponsorships, creator collaborations',
+  },
+  {
+    value: 'hospitality_vip',
+    label: 'Hospitality/VIP',
+    description: 'Suite experiences, meet & greets, exclusive access, premium client entertainment',
+  },
+  {
+    value: 'retail_product',
+    label: 'Retail/Product',
+    description: 'Co-branded merchandise, limited drops, licensing, retail activations',
+  },
 ];
 
 const TECH_MODIFIERS: { value: TechModifier; label: string }[] = [
@@ -40,22 +58,15 @@ const TECH_MODIFIERS: { value: TechModifier; label: string }[] = [
   { value: 'AR', label: 'AR' },
 ];
 
-const CONTENT_STYLES: { value: ContentStyle; label: string; description: string }[] = [
-  {
-    value: 'creator_led',
-    label: 'Creator-Led',
-    description: 'Content featuring influencers and digital creators',
-  },
-  {
-    value: 'talent_led',
-    label: 'Talent-Led',
-    description: 'Content featuring athletes or celebrities',
-  },
-  {
-    value: 'branded_content',
-    label: 'Branded Content',
-    description: 'Brand-produced editorial or documentary content',
-  },
+// Tech modifiers available for all lanes except content
+const LANES_WITH_TECH_MODIFIERS: IdeaLane[] = [
+  'live_experience',
+  'digital',
+  'social_impact',
+  'talent_athlete',
+  'gaming_esports',
+  'hospitality_vip',
+  'retail_product',
 ];
 
 export function IdeaLaneSelector({
@@ -63,11 +74,8 @@ export function IdeaLaneSelector({
   onLaneChange,
   techModifiers,
   onTechModifiersChange,
-  contentStyle,
-  onContentStyleChange,
 }: IdeaLaneSelectorProps) {
-  const showTechModifiers = selectedLane === 'live_experience' || selectedLane === 'digital' || selectedLane === 'social_impact';
-  const showContentStyle = selectedLane === 'content';
+  const showTechModifiers = selectedLane && LANES_WITH_TECH_MODIFIERS.includes(selectedLane);
 
   const toggleTechModifier = (modifier: TechModifier) => {
     if (techModifiers.includes(modifier)) {
@@ -84,7 +92,7 @@ export function IdeaLaneSelector({
         <label className="block text-sm font-medium text-foreground">
           Idea Lane
         </label>
-        <div className="grid gap-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           {IDEA_LANES.map((lane) => (
             <label
               key={lane.value}
@@ -128,7 +136,7 @@ export function IdeaLaneSelector({
         </div>
       </div>
 
-      {/* Tech Modifiers - shown for Live Experience and Digital */}
+      {/* Tech Modifiers - shown for all lanes except content */}
       {showTechModifiers && (
         <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
           <label className="block text-sm font-medium text-foreground">
@@ -148,57 +156,6 @@ export function IdeaLaneSelector({
               >
                 {modifier.label}
               </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Content Style - shown for Content */}
-      {showContentStyle && (
-        <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-          <label className="block text-sm font-medium text-foreground">
-            Content Style
-          </label>
-          <div className="grid gap-2">
-            {CONTENT_STYLES.map((style) => (
-              <label
-                key={style.value}
-                className={`relative flex cursor-pointer rounded-lg border p-3 transition-colors ${
-                  contentStyle === style.value
-                    ? 'border-accent bg-accent/5'
-                    : 'border-card-border bg-card-bg hover:border-muted'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="content-style"
-                  value={style.value}
-                  checked={contentStyle === style.value}
-                  onChange={() => onContentStyleChange(style.value)}
-                  className="sr-only"
-                />
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${
-                      contentStyle === style.value
-                        ? 'border-accent'
-                        : 'border-muted'
-                    }`}
-                  >
-                    {contentStyle === style.value && (
-                      <div className="h-2 w-2 rounded-full bg-accent" />
-                    )}
-                  </div>
-                  <div>
-                    <span className="text-sm font-medium text-foreground">
-                      {style.label}
-                    </span>
-                    <span className="text-xs text-muted ml-2">
-                      {style.description}
-                    </span>
-                  </div>
-                </div>
-              </label>
             ))}
           </div>
         </div>

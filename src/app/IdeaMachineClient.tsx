@@ -62,9 +62,6 @@ export function IdeaMachineClient() {
       if (data.techModifiers.length > 0) {
         formData.append('tech_modifiers', JSON.stringify(data.techModifiers));
       }
-      if (data.contentStyle) {
-        formData.append('content_style', data.contentStyle);
-      }
       formData.append('num_ideas', data.numIdeas.toString());
       if (data.outputStyle) {
         formData.append('output_style', JSON.stringify(data.outputStyle));
