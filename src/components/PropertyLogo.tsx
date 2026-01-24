@@ -68,6 +68,9 @@ const PROPERTY_DOMAINS: Record<string, string> = {
   // Cultural Moments
   'Super Bowl': 'nfl.com',
   'World Cup': 'fifa.com',
+  'College Football Playoff': 'collegefootballplayoff.com',
+  'FIFA World Cup': 'worldcups.top',
+  'Kentucky Derby': 'kentuckyderby.com',
   'Olympics': 'olympics.com',
   'March Madness': 'ncaa.com',
   'NBA Finals': 'nba.com',
