@@ -8,6 +8,7 @@ export interface AuthUser {
   username: string;
   display_name: string;
   role: 'admin' | 'user';
+  avatar_url: string | null;
 }
 
 interface AuthContextType {

@@ -69,9 +69,17 @@ export default function AdminLayout({
         {/* User Section */}
         <div className="p-4 border-t border-card-border">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-sm font-medium">
-              {user?.display_name?.[0]?.toUpperCase() || 'A'}
-            </div>
+            {user?.avatar_url ? (
+              <img
+                src={user.avatar_url}
+                alt={user.display_name}
+                className="w-8 h-8 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-sm font-medium">
+                {user?.display_name?.[0]?.toUpperCase() || 'A'}
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground truncate">
                 {user?.display_name}

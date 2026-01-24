@@ -8,6 +8,7 @@ interface User {
   username: string;
   display_name: string;
   role: 'admin' | 'user';
+  avatar_url: string | null;
   created_at: string;
   last_login_at: string | null;
 }
@@ -33,6 +34,7 @@ export default function UsersPage() {
   const [editRole, setEditRole] = useState<'user' | 'admin'>('user');
   const [isEditing, setIsEditing] = useState(false);
   const [editError, setEditError] = useState('');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Delete confirmation
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
@@ -168,6 +170,66 @@ export default function UsersPage() {
     }
   };
 
+  const handleAvatarUpload = async (file: File) => {
+    if (!editingUser) return;
+
+    setIsUploadingAvatar(true);
+    setEditError('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`/api/admin/users/${editingUser.id}/avatar`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUsers((prev) =>
+          prev.map((u) => (u.id === editingUser.id ? data.user : u))
+        );
+        setEditingUser(data.user);
+      } else {
+        setEditError(data.error || 'Failed to upload avatar');
+      }
+    } catch {
+      setEditError('Failed to upload avatar');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleAvatarRemove = async () => {
+    if (!editingUser) return;
+
+    setIsUploadingAvatar(true);
+    setEditError('');
+
+    try {
+      const response = await fetch(`/api/admin/users/${editingUser.id}/avatar`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUsers((prev) =>
+          prev.map((u) => (u.id === editingUser.id ? data.user : u))
+        );
+        setEditingUser(data.user);
+      } else {
+        setEditError(data.error || 'Failed to remove avatar');
+      }
+    } catch {
+      setEditError('Failed to remove avatar');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
   const openEditModal = (user: User) => {
     setEditingUser(user);
     setEditDisplayName(user.display_name);
@@ -231,9 +293,17 @@ export default function UsersPage() {
               <tr key={user.id} className="border-b border-card-border last:border-0">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-sm font-medium">
-                      {user.display_name[0].toUpperCase()}
-                    </div>
+                    {user.avatar_url ? (
+                      <img
+                        src={user.avatar_url}
+                        alt={user.display_name}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-sm font-medium">
+                        {user.display_name[0].toUpperCase()}
+                      </div>
+                    )}
                     <div>
                       <p className="text-sm font-medium text-foreground">{user.display_name}</p>
                       <p className="text-xs text-muted">@{user.username}</p>
@@ -360,6 +430,55 @@ export default function UsersPage() {
         title="Edit User"
       >
         <div className="space-y-4">
+          {/* Avatar Upload */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Profile Picture
+            </label>
+            <div className="flex items-center gap-4">
+              {editingUser?.avatar_url ? (
+                <img
+                  src={editingUser.avatar_url}
+                  alt={editingUser.display_name}
+                  className="w-16 h-16 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xl font-medium">
+                  {editingUser?.display_name[0].toUpperCase()}
+                </div>
+              )}
+              <div className="flex flex-col gap-2">
+                <label className="cursor-pointer">
+                  <span className="inline-flex items-center px-3 py-1.5 text-sm bg-card-border hover:bg-muted/30 rounded transition-colors">
+                    {isUploadingAvatar ? 'Uploading...' : 'Upload Photo'}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleAvatarUpload(file);
+                      e.target.value = '';
+                    }}
+                    disabled={isUploadingAvatar}
+                  />
+                </label>
+                {editingUser?.avatar_url && (
+                  <button
+                    type="button"
+                    onClick={handleAvatarRemove}
+                    disabled={isUploadingAvatar}
+                    className="text-sm text-error hover:underline text-left"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            </div>
+            <p className="text-xs text-muted mt-2">JPG, PNG, GIF or WebP. Max 2MB.</p>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
               Username

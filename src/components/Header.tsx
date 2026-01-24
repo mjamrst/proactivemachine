@@ -50,9 +50,17 @@ export function Header({ currentPage }: HeaderProps) {
           <div className="flex items-center gap-3 pl-3 border-l border-card-border">
             {user && (
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-medium">
-                  {user.display_name[0].toUpperCase()}
-                </div>
+                {user.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt={user.display_name}
+                    className="w-7 h-7 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-medium">
+                    {user.display_name[0].toUpperCase()}
+                  </div>
+                )}
                 <span className="text-sm text-muted hidden sm:inline">
                   {user.display_name}
                 </span>
