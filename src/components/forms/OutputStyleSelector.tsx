@@ -18,6 +18,13 @@ interface StyleProfile {
 
 const STYLE_PROFILES: StyleProfile[] = [
   {
+    type: 'generic',
+    name: 'No Sauce',
+    emoji: '🍽️',
+    description: 'Clean, professional output - no special flavor added',
+    color: 'from-gray-500 to-slate-500',
+  },
+  {
     type: 'techbro',
     name: 'Techbro',
     emoji: '🚀',

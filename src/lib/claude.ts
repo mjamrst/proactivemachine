@@ -59,6 +59,11 @@ interface GenerateIdeasParams {
 
 // Output style personality prompts with intensity levels
 const OUTPUT_STYLE_PROMPTS: Record<OutputStyleType, { name: string; base: string; intensifiers: string[] }> = {
+  generic: {
+    name: 'No Sauce',
+    base: '',
+    intensifiers: ['', '', '', '', '']
+  },
   techbro: {
     name: 'Techbro',
     base: 'Write with a tech-forward perspective. Use startup and technology terminology. Focus on disruption, scalability, and innovation.',
@@ -159,8 +164,8 @@ IDEA LANE: ${laneLabels[ideaLane]}`;
     prompt += `\n\nIMPORTANT: Use the information from the reference documents above to make ideas highly specific and relevant to the brand's current goals, campaigns, and challenges. The ideas should directly address the brief requirements if provided.`;
   }
 
-  // Add output style instructions if specified
-  if (outputStyle) {
+  // Add output style instructions if specified (skip for generic/no-sauce)
+  if (outputStyle && outputStyle.type !== 'generic') {
     const styleConfig = OUTPUT_STYLE_PROMPTS[outputStyle.type];
     const intensityIndex = Math.min(outputStyle.intensity - 1, styleConfig.intensifiers.length - 1);
     const intensityPrompt = styleConfig.intensifiers[intensityIndex];

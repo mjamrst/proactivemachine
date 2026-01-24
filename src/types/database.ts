@@ -20,6 +20,7 @@ export type ContentStyle =
   | 'branded_content';
 
 export type OutputStyleType =
+  | 'generic'
   | 'techbro'
   | 'creative_strategist'
   | 'gen_z'
