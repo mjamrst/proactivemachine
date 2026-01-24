@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import type { Property } from '@/types/database';
+import { PropertyLogo } from '@/components/PropertyLogo';
 
 interface PropertySelectorProps {
   properties: Property[];
@@ -180,6 +181,7 @@ export function PropertySelector({
                                   onChange={() => toggleProperty(league.id)}
                                   className="w-4 h-4 rounded border-card-border bg-background text-accent focus:ring-accent focus:ring-offset-background"
                                 />
+                                <PropertyLogo name={league.name} size="sm" />
                                 <span className="text-sm text-foreground">{league.name}</span>
                               </label>
                             </div>
@@ -198,6 +200,7 @@ export function PropertySelector({
                                       onChange={() => toggleProperty(team.id)}
                                       className="w-4 h-4 rounded border-card-border bg-background text-accent focus:ring-accent focus:ring-offset-background"
                                     />
+                                    <PropertyLogo name={team.name} size="sm" />
                                     <span className="text-sm text-muted">{team.name}</span>
                                   </label>
                                 ))}
@@ -221,6 +224,7 @@ export function PropertySelector({
                             onChange={() => toggleProperty(property.id)}
                             className="w-4 h-4 rounded border-card-border bg-background text-accent focus:ring-accent focus:ring-offset-background"
                           />
+                          <PropertyLogo name={property.name} size="sm" />
                           <span className="text-sm text-foreground truncate">{property.name}</span>
                         </label>
                       ))}
@@ -242,8 +246,9 @@ export function PropertySelector({
             return (
               <span
                 key={id}
-                className="inline-flex items-center gap-1 px-2 py-1 bg-accent/10 text-accent text-xs rounded-full"
+                className="inline-flex items-center gap-1.5 px-2 py-1 bg-accent/10 text-accent text-xs rounded-full"
               >
+                <PropertyLogo name={property.name} size="sm" className="w-4 h-4" />
                 {property.name}
                 <button
                   type="button"
