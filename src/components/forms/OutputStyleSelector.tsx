@@ -102,7 +102,7 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
       </div>
 
       {/* Style Cards */}
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
         {STYLE_PROFILES.map((profile) => {
           const isSelected = value?.type === profile.type;
           return (
@@ -110,7 +110,7 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
               key={profile.type}
               type="button"
               onClick={() => handleSelectStyle(profile.type)}
-              className={`relative p-4 rounded-xl border-2 transition-all text-left ${
+              className={`relative p-4 rounded-xl border-2 transition-all flex flex-col items-center text-center ${
                 isSelected
                   ? 'border-accent bg-accent/10 shadow-lg scale-[1.02]'
                   : 'border-card-border bg-card-bg hover:border-muted hover:bg-card-border/50'
@@ -121,25 +121,6 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
                 <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-lg bg-gradient-to-r ${profile.color}`} />
               )}
 
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 relative flex-shrink-0">
-                  <Image
-                    src={profile.image}
-                    alt={profile.name}
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className={`font-semibold truncate ${isSelected ? 'text-accent' : 'text-foreground'}`}>
-                    {profile.name}
-                  </h4>
-                  <p className="text-xs text-muted mt-1 line-clamp-2">
-                    {profile.description}
-                  </p>
-                </div>
-              </div>
-
               {/* Selection indicator */}
               {isSelected && (
                 <div className="absolute top-2 right-2">
@@ -148,6 +129,24 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
                   </svg>
                 </div>
               )}
+
+              {/* Character Image - Prominent */}
+              <div className="w-20 h-20 relative mb-3">
+                <Image
+                  src={profile.image}
+                  alt={profile.name}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+
+              {/* Name and Description */}
+              <h4 className={`font-semibold text-sm ${isSelected ? 'text-accent' : 'text-foreground'}`}>
+                {profile.name}
+              </h4>
+              <p className="text-xs text-muted mt-1 line-clamp-2">
+                {profile.description}
+              </p>
             </button>
           );
         })}
@@ -157,8 +156,8 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
       {value && selectedProfile && value.type !== 'generic' && (
         <div className="mt-6 p-4 bg-card-border/30 rounded-xl space-y-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 relative flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 relative flex-shrink-0">
                 <Image
                   src={selectedProfile.image}
                   alt={selectedProfile.name}
