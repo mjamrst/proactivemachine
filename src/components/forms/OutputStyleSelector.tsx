@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { OutputStyleType, OutputStyle } from '@/types/database';
 
 interface OutputStyleSelectorProps {
@@ -64,6 +64,8 @@ const INTENSITY_LABELS = [
 
 export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   const handleSelectStyle = (type: OutputStyleType) => {
     if (value?.type === type) {
@@ -159,44 +161,80 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
           </div>
 
           {/* Custom Slider */}
-          <div className="relative pt-2">
-            {/* Track background */}
-            <div className="h-2 bg-card-border rounded-full overflow-hidden">
-              {/* Filled track */}
+          <div className="relative pt-2 pb-1" ref={sliderRef}>
+            {/* Track container with padding for thumb overflow */}
+            <div className="relative h-8 flex items-center px-3">
+              {/* Track background */}
+              <div className="absolute left-3 right-3 h-3 bg-card-border rounded-full overflow-hidden shadow-inner">
+                {/* Filled track */}
+                <div
+                  className={`h-full bg-gradient-to-r ${selectedProfile.color} transition-all ${isDragging ? 'duration-0' : 'duration-150'}`}
+                  style={{ width: `${((value.intensity - 1) / 4) * 100}%` }}
+                />
+              </div>
+
+              {/* Draggable Thumb */}
               <div
-                className={`h-full bg-gradient-to-r ${selectedProfile.color} transition-all duration-200`}
-                style={{ width: `${((value.intensity - 1) / 4) * 100}%` }}
+                className="absolute h-3"
+                style={{
+                  left: `calc(${((value.intensity - 1) / 4) * 100}% * (100% - 24px) / 100% + 12px)`,
+                  width: 'calc(100% - 24px)',
+                }}
+              >
+                <div
+                  className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all ${isDragging ? 'duration-0' : 'duration-150'}`}
+                  style={{ left: `${((value.intensity - 1) / 4) * 100}%` }}
+                >
+                  <div
+                    className={`w-7 h-7 rounded-full bg-gradient-to-br ${selectedProfile.color} shadow-lg border-4 border-white dark:border-gray-800 transition-transform ${
+                      isDragging ? 'scale-125 shadow-xl' : 'hover:scale-110'
+                    }`}
+                    style={{
+                      boxShadow: isDragging
+                        ? '0 0 20px rgba(var(--accent-rgb, 59, 130, 246), 0.5), 0 4px 12px rgba(0,0,0,0.3)'
+                        : '0 2px 8px rgba(0,0,0,0.2)',
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Invisible range input for accessibility and drag handling */}
+              <input
+                type="range"
+                min="1"
+                max="5"
+                step="1"
+                value={value.intensity}
+                onChange={(e) => handleIntensityChange(parseInt(e.target.value))}
+                onMouseDown={() => setIsDragging(true)}
+                onMouseUp={() => setIsDragging(false)}
+                onMouseLeave={() => setIsDragging(false)}
+                onTouchStart={() => setIsDragging(true)}
+                onTouchEnd={() => setIsDragging(false)}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-grab active:cursor-grabbing z-10"
+                style={{ margin: 0 }}
               />
             </div>
 
-            {/* Slider input */}
-            <input
-              type="range"
-              min="1"
-              max="5"
-              step="1"
-              value={value.intensity}
-              onChange={(e) => handleIntensityChange(parseInt(e.target.value))}
-              className="absolute inset-0 w-full h-2 opacity-0 cursor-pointer"
-            />
-
-            {/* Tick marks */}
-            <div className="flex justify-between mt-2">
+            {/* Tick marks and labels */}
+            <div className="flex justify-between px-3 mt-1">
               {INTENSITY_LABELS.map((label) => (
                 <button
                   key={label.value}
                   type="button"
                   onClick={() => handleIntensityChange(label.value)}
-                  className={`flex flex-col items-center transition-colors ${
-                    value.intensity === label.value ? 'text-accent' : 'text-muted hover:text-foreground'
+                  className={`flex flex-col items-center transition-all ${
+                    value.intensity === label.value ? 'text-foreground scale-110' : 'text-muted hover:text-foreground'
                   }`}
                 >
-                  <div className={`w-3 h-3 rounded-full border-2 transition-all ${
+                  <div className={`w-1.5 h-1.5 rounded-full mb-1 transition-all ${
                     value.intensity >= label.value
-                      ? `bg-gradient-to-r ${selectedProfile.color} border-transparent`
-                      : 'bg-card-bg border-card-border'
+                      ? `bg-gradient-to-r ${selectedProfile.color}`
+                      : 'bg-card-border'
                   }`} />
-                  <span className="text-xs mt-1 hidden sm:block">{label.label}</span>
+                  <span className={`text-xs transition-all ${value.intensity === label.value ? 'font-semibold' : ''}`}>
+                    {label.label}
+                  </span>
                 </button>
               ))}
             </div>
