@@ -51,6 +51,7 @@ const PROPERTY_DOMAINS: Record<string, string> = {
   'Rolling Loud': 'rollingloud.com',
   'Governors Ball': 'governorsballmusicfestival.com',
   'Outside Lands': 'sfoutsidelands.com',
+  'Stagecoach': 'stagecoachfestival.com',
 
   // Entertainment
   'Netflix': 'netflix.com',
