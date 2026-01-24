@@ -43,6 +43,7 @@ const PROPERTY_DOMAINS: Record<string, string> = {
   'Austin City Limits': 'aclfestival.com',
   'Electric Daisy Carnival': 'electricdaisycarnival.com',
   'EDC': 'electricdaisycarnival.com',
+  'EDC (Electric Daisy Carnival)': 'electricdaisycarnival.com',
   'Ultra Music Festival': 'ultramusicfestival.com',
   'Burning Man': 'burningman.org',
   'Glastonbury': 'glastonburyfestivals.co.uk',
