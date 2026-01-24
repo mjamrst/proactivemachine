@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Button, Input, Modal } from '@/components/ui';
+import { ClientLogo } from '@/components/ClientLogo';
 import type { Client } from '@/types/database';
 
 interface ClientSelectorProps {
   clients: Client[];
   selectedClientId: string | null;
   onSelect: (clientId: string) => void;
-  onAddClient: (name: string) => Promise<Client>;
+  onAddClient: (name: string, domain?: string) => Promise<Client>;
 }
 
 export function ClientSelector({
@@ -21,6 +22,7 @@ export function ClientSelector({
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newClientName, setNewClientName] = useState('');
+  const [newClientDomain, setNewClientDomain] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -52,9 +54,11 @@ export function ClientSelector({
     setError('');
 
     try {
-      const newClient = await onAddClient(newClientName.trim());
+      const domain = newClientDomain.trim() || undefined;
+      const newClient = await onAddClient(newClientName.trim(), domain);
       onSelect(newClient.id);
       setNewClientName('');
+      setNewClientDomain('');
       setIsModalOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add client');
@@ -76,9 +80,14 @@ export function ClientSelector({
           onClick={() => setIsOpen(!isOpen)}
           className="w-full flex items-center justify-between px-4 py-2.5 bg-card-bg border border-card-border rounded-lg text-left hover:border-muted focus:outline-none focus:ring-2 focus:ring-accent"
         >
-          <span className={selectedClient ? 'text-foreground' : 'text-muted'}>
-            {selectedClient?.name || 'Select a client...'}
-          </span>
+          {selectedClient ? (
+            <div className="flex items-center gap-3">
+              <ClientLogo domain={selectedClient.domain} name={selectedClient.name} size="sm" />
+              <span className="text-foreground">{selectedClient.name}</span>
+            </div>
+          ) : (
+            <span className="text-muted">Select a client...</span>
+          )}
           <svg
             className={`w-5 h-5 text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
             fill="none"
@@ -118,13 +127,14 @@ export function ClientSelector({
                       setIsOpen(false);
                       setSearch('');
                     }}
-                    className={`w-full px-4 py-2.5 text-left text-sm hover:bg-card-border transition-colors ${
+                    className={`w-full px-4 py-2.5 text-left text-sm hover:bg-card-border transition-colors flex items-center gap-3 ${
                       client.id === selectedClientId
                         ? 'bg-accent/10 text-accent'
                         : 'text-foreground'
                     }`}
                   >
-                    {client.name}
+                    <ClientLogo domain={client.domain} name={client.name} size="sm" />
+                    <span>{client.name}</span>
                   </button>
                 ))
               )}
@@ -156,6 +166,7 @@ export function ClientSelector({
         onClose={() => {
           setIsModalOpen(false);
           setNewClientName('');
+          setNewClientDomain('');
           setError('');
         }}
         title="Add New Client"
@@ -169,12 +180,22 @@ export function ClientSelector({
             error={error}
             autoFocus
           />
+          <Input
+            label="Website Domain (for logo)"
+            placeholder="e.g., nike.com"
+            value={newClientDomain}
+            onChange={(e) => setNewClientDomain(e.target.value)}
+          />
+          <p className="text-xs text-muted">
+            Enter the company&apos;s website domain to display their logo
+          </p>
           <div className="flex justify-end gap-3">
             <Button
               variant="secondary"
               onClick={() => {
                 setIsModalOpen(false);
                 setNewClientName('');
+                setNewClientDomain('');
                 setError('');
               }}
             >

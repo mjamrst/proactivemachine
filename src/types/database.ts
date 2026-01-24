@@ -23,6 +23,7 @@ export type ContentStyle =
 export interface Client {
   id: string;
   name: string;
+  domain: string | null;
   created_at: string;
 }
 
@@ -90,6 +91,7 @@ export interface SessionDocument {
 // Insert types (without auto-generated fields)
 export interface ClientInsert {
   name: string;
+  domain?: string | null;
 }
 
 export interface PropertyInsert {

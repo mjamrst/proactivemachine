@@ -40,8 +40,8 @@ export function IdeaMachineClient() {
     loadData();
   }, []);
 
-  const handleAddClient = async (name: string): Promise<Client> => {
-    const newClient = await createClient(supabase, { name });
+  const handleAddClient = async (name: string, domain?: string): Promise<Client> => {
+    const newClient = await createClient(supabase, { name, domain: domain || null });
     setClients((prev) => [...prev, newClient].sort((a, b) => a.name.localeCompare(b.name)));
     return newClient;
   };
