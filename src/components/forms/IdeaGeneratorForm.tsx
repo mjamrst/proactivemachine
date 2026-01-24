@@ -8,7 +8,7 @@ import { NumberOfIdeasSelector } from './NumberOfIdeasSelector';
 import { OutputStyleSelector } from './OutputStyleSelector';
 import { DocumentUploader } from './DocumentUploader';
 import { Button } from '@/components/ui';
-import type { Client, Property, IdeaLane, TechModifier, ClientDocument, OutputStyle } from '@/types/database';
+import type { Client, Property, IdeaLane, TechModifier, AudienceModifier, PlatformModifier, BudgetTier, ClientDocument, OutputStyle } from '@/types/database';
 
 interface IdeaGeneratorFormProps {
   clients: Client[];
@@ -24,6 +24,9 @@ export interface GenerateFormData {
   propertyIds: string[];
   ideaLane: IdeaLane;
   techModifiers: TechModifier[];
+  audienceModifier: AudienceModifier | null;
+  platformModifier: PlatformModifier | null;
+  budgetTier: BudgetTier | null;
   numIdeas: number;
   outputStyle: OutputStyle | null;
   sessionFiles: File[];
@@ -50,6 +53,9 @@ export function IdeaGeneratorForm({
   const [selectedPropertyIds, setSelectedPropertyIds] = useState<string[]>([]);
   const [selectedLane, setSelectedLane] = useState<IdeaLane | null>(null);
   const [techModifiers, setTechModifiers] = useState<TechModifier[]>([]);
+  const [audienceModifier, setAudienceModifier] = useState<AudienceModifier | null>(null);
+  const [platformModifier, setPlatformModifier] = useState<PlatformModifier | null>(null);
+  const [budgetTier, setBudgetTier] = useState<BudgetTier | null>(null);
   const [numIdeas, setNumIdeas] = useState(5);
   const [outputStyle, setOutputStyle] = useState<OutputStyle | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -98,6 +104,9 @@ export function IdeaGeneratorForm({
       propertyIds: selectedPropertyIds,
       ideaLane: selectedLane!,
       techModifiers,
+      audienceModifier,
+      platformModifier,
+      budgetTier,
       numIdeas,
       outputStyle,
       sessionFiles,
@@ -180,6 +189,12 @@ export function IdeaGeneratorForm({
           onLaneChange={handleLaneChange}
           techModifiers={techModifiers}
           onTechModifiersChange={setTechModifiers}
+          audienceModifier={audienceModifier}
+          onAudienceModifierChange={setAudienceModifier}
+          platformModifier={platformModifier}
+          onPlatformModifierChange={setPlatformModifier}
+          budgetTier={budgetTier}
+          onBudgetTierChange={setBudgetTier}
         />
         {errors.lane && <p className="mt-2 text-sm text-error">{errors.lane}</p>}
       </Section>

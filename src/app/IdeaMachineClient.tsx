@@ -62,6 +62,15 @@ export function IdeaMachineClient() {
       if (data.techModifiers.length > 0) {
         formData.append('tech_modifiers', JSON.stringify(data.techModifiers));
       }
+      if (data.audienceModifier) {
+        formData.append('audience_modifier', data.audienceModifier);
+      }
+      if (data.platformModifier) {
+        formData.append('platform_modifier', data.platformModifier);
+      }
+      if (data.budgetTier) {
+        formData.append('budget_tier', data.budgetTier);
+      }
       formData.append('num_ideas', data.numIdeas.toString());
       if (data.outputStyle) {
         formData.append('output_style', JSON.stringify(data.outputStyle));

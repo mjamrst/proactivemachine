@@ -1,13 +1,19 @@
 'use client';
 
 import Image from 'next/image';
-import type { IdeaLane, TechModifier } from '@/types/database';
+import type { IdeaLane, TechModifier, AudienceModifier, PlatformModifier, BudgetTier } from '@/types/database';
 
 interface IdeaLaneSelectorProps {
   selectedLane: IdeaLane | null;
   onLaneChange: (lane: IdeaLane) => void;
   techModifiers: TechModifier[];
   onTechModifiersChange: (modifiers: TechModifier[]) => void;
+  audienceModifier: AudienceModifier | null;
+  onAudienceModifierChange: (modifier: AudienceModifier | null) => void;
+  platformModifier: PlatformModifier | null;
+  onPlatformModifierChange: (modifier: PlatformModifier | null) => void;
+  budgetTier: BudgetTier | null;
+  onBudgetTierChange: (tier: BudgetTier | null) => void;
 }
 
 interface LaneConfig {
@@ -15,7 +21,7 @@ interface LaneConfig {
   label: string;
   description: string;
   emoji: string;
-  image?: string; // Will be added when images are ready
+  image?: string;
 }
 
 const IDEA_LANES: LaneConfig[] = [
@@ -81,6 +87,36 @@ const TECH_MODIFIERS: { value: TechModifier; label: string }[] = [
   { value: 'AI', label: 'AI' },
   { value: 'VR', label: 'VR' },
   { value: 'AR', label: 'AR' },
+  { value: 'Web3', label: 'Web3' },
+  { value: 'Wearables', label: 'Wearables' },
+  { value: 'Voice', label: 'Voice' },
+  { value: 'Drones', label: 'Drones' },
+  { value: 'NFC/RFID', label: 'NFC/RFID' },
+];
+
+const AUDIENCE_MODIFIERS: { value: AudienceModifier; label: string }[] = [
+  { value: 'gen_z', label: 'Gen Z' },
+  { value: 'millennials', label: 'Millennials' },
+  { value: 'families', label: 'Families' },
+  { value: 'superfans', label: 'Superfans' },
+  { value: 'casual_fans', label: 'Casual Fans' },
+  { value: 'b2b_corporate', label: 'B2B/Corporate' },
+];
+
+const PLATFORM_MODIFIERS: { value: PlatformModifier; label: string }[] = [
+  { value: 'tiktok', label: 'TikTok' },
+  { value: 'instagram', label: 'Instagram' },
+  { value: 'youtube', label: 'YouTube' },
+  { value: 'twitch', label: 'Twitch' },
+  { value: 'x', label: 'X' },
+  { value: 'snapchat', label: 'Snapchat' },
+  { value: 'discord', label: 'Discord' },
+];
+
+const BUDGET_TIERS: { value: BudgetTier; label: string; description: string }[] = [
+  { value: 'scrappy', label: 'Scrappy', description: 'Under $50K' },
+  { value: 'mid_tier', label: 'Mid-Tier', description: '$50K–$500K' },
+  { value: 'flagship', label: 'Flagship', description: '$500K+' },
 ];
 
 // Tech modifiers available for all lanes except content
@@ -99,6 +135,12 @@ export function IdeaLaneSelector({
   onLaneChange,
   techModifiers,
   onTechModifiersChange,
+  audienceModifier,
+  onAudienceModifierChange,
+  platformModifier,
+  onPlatformModifierChange,
+  budgetTier,
+  onBudgetTierChange,
 }: IdeaLaneSelectorProps) {
   const showTechModifiers = selectedLane && LANES_WITH_TECH_MODIFIERS.includes(selectedLane);
 
@@ -107,6 +149,30 @@ export function IdeaLaneSelector({
       onTechModifiersChange(techModifiers.filter((m) => m !== modifier));
     } else {
       onTechModifiersChange([...techModifiers, modifier]);
+    }
+  };
+
+  const toggleAudienceModifier = (modifier: AudienceModifier) => {
+    if (audienceModifier === modifier) {
+      onAudienceModifierChange(null);
+    } else {
+      onAudienceModifierChange(modifier);
+    }
+  };
+
+  const togglePlatformModifier = (modifier: PlatformModifier) => {
+    if (platformModifier === modifier) {
+      onPlatformModifierChange(null);
+    } else {
+      onPlatformModifierChange(modifier);
+    }
+  };
+
+  const toggleBudgetTier = (tier: BudgetTier) => {
+    if (budgetTier === tier) {
+      onBudgetTierChange(null);
+    } else {
+      onBudgetTierChange(tier);
     }
   };
 
@@ -126,7 +192,7 @@ export function IdeaLaneSelector({
                 className={`relative flex flex-col items-center text-center cursor-pointer rounded-xl border-2 p-4 transition-all ${
                   isSelected
                     ? 'border-accent bg-accent/5 shadow-lg scale-[1.02]'
-                    : 'border-card-border bg-card-bg hover:border-muted hover:bg-card-border/50'
+                    : 'border-gray-200 bg-[#f7f7f5] hover:border-gray-300 hover:bg-gray-100'
                 }`}
               >
                 <input
@@ -176,27 +242,101 @@ export function IdeaLaneSelector({
         </div>
       </div>
 
-      {/* Tech Modifiers - shown for all lanes except content */}
-      {showTechModifiers && (
-        <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-          <label className="block text-sm font-medium text-foreground">
-            Technology Focus <span className="text-muted">(optional)</span>
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {TECH_MODIFIERS.map((modifier) => (
-              <button
-                key={modifier.value}
-                type="button"
-                onClick={() => toggleTechModifier(modifier.value)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  techModifiers.includes(modifier.value)
-                    ? 'bg-accent text-white'
-                    : 'bg-card-bg border border-card-border text-foreground hover:border-muted'
-                }`}
-              >
-                {modifier.label}
-              </button>
-            ))}
+      {/* Modifiers - shown when a lane is selected */}
+      {selectedLane && (
+        <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-200">
+          {/* Tech Modifiers - multi-select, not shown for content */}
+          {showTechModifiers && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-foreground">
+                Technology <span className="text-muted font-normal">(optional, select multiple)</span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {TECH_MODIFIERS.map((modifier) => (
+                  <button
+                    key={modifier.value}
+                    type="button"
+                    onClick={() => toggleTechModifier(modifier.value)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      techModifiers.includes(modifier.value)
+                        ? 'bg-accent text-white'
+                        : 'bg-[#f7f7f5] border border-gray-200 text-foreground hover:border-gray-300'
+                    }`}
+                  >
+                    {modifier.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Audience Modifier - single select */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-foreground">
+              Audience <span className="text-muted font-normal">(optional)</span>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {AUDIENCE_MODIFIERS.map((modifier) => (
+                <button
+                  key={modifier.value}
+                  type="button"
+                  onClick={() => toggleAudienceModifier(modifier.value)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    audienceModifier === modifier.value
+                      ? 'bg-accent text-white'
+                      : 'bg-[#f7f7f5] border border-gray-200 text-foreground hover:border-gray-300'
+                  }`}
+                >
+                  {modifier.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Platform Modifier - single select */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-foreground">
+              Platform <span className="text-muted font-normal">(optional)</span>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {PLATFORM_MODIFIERS.map((modifier) => (
+                <button
+                  key={modifier.value}
+                  type="button"
+                  onClick={() => togglePlatformModifier(modifier.value)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    platformModifier === modifier.value
+                      ? 'bg-accent text-white'
+                      : 'bg-[#f7f7f5] border border-gray-200 text-foreground hover:border-gray-300'
+                  }`}
+                >
+                  {modifier.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Budget Tier - single select */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-foreground">
+              Budget <span className="text-muted font-normal">(optional)</span>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {BUDGET_TIERS.map((tier) => (
+                <button
+                  key={tier.value}
+                  type="button"
+                  onClick={() => toggleBudgetTier(tier.value)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    budgetTier === tier.value
+                      ? 'bg-accent text-white'
+                      : 'bg-[#f7f7f5] border border-gray-200 text-foreground hover:border-gray-300'
+                  }`}
+                >
+                  {tier.label} <span className="opacity-70">({tier.description})</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

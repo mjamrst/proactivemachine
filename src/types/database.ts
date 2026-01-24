@@ -17,7 +17,37 @@ export type IdeaLane =
   | 'hospitality_vip'
   | 'retail_product';
 
-export type TechModifier = 'AI' | 'VR' | 'AR';
+export type TechModifier =
+  | 'AI'
+  | 'VR'
+  | 'AR'
+  | 'Web3'
+  | 'Wearables'
+  | 'Voice'
+  | 'Drones'
+  | 'NFC/RFID';
+
+export type AudienceModifier =
+  | 'gen_z'
+  | 'millennials'
+  | 'families'
+  | 'superfans'
+  | 'casual_fans'
+  | 'b2b_corporate';
+
+export type PlatformModifier =
+  | 'tiktok'
+  | 'instagram'
+  | 'youtube'
+  | 'twitch'
+  | 'x'
+  | 'snapchat'
+  | 'discord';
+
+export type BudgetTier =
+  | 'scrappy'
+  | 'mid_tier'
+  | 'flagship';
 
 export type ContentStyle =
   | 'creator_led'
@@ -64,6 +94,9 @@ export interface IdeaSession {
   property_ids: string[];
   idea_lane: IdeaLane;
   tech_modifiers: TechModifier[] | null;
+  audience_modifier: AudienceModifier | null;
+  platform_modifier: PlatformModifier | null;
+  budget_tier: BudgetTier | null;
   content_style: ContentStyle | null;
   num_ideas: number;
   user_id: string | null;
@@ -129,6 +162,9 @@ export interface IdeaSessionInsert {
   property_ids: string[];
   idea_lane: IdeaLane;
   tech_modifiers?: TechModifier[] | null;
+  audience_modifier?: AudienceModifier | null;
+  platform_modifier?: PlatformModifier | null;
+  budget_tier?: BudgetTier | null;
   content_style?: ContentStyle | null;
   num_ideas: number;
   user_id?: string | null;
@@ -160,6 +196,9 @@ export interface GenerateIdeasRequest {
   property_ids: string[];
   idea_lane: IdeaLane;
   tech_modifiers?: TechModifier[];
+  audience_modifier?: AudienceModifier;
+  platform_modifier?: PlatformModifier;
+  budget_tier?: BudgetTier;
   content_style?: ContentStyle;
   num_ideas: number;
   session_documents?: File[];

@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type { GeneratedIdea, IdeaLane, TechModifier, OutputStyle, OutputStyleType } from '@/types/database';
+import type { GeneratedIdea, IdeaLane, TechModifier, AudienceModifier, PlatformModifier, BudgetTier, OutputStyle, OutputStyleType } from '@/types/database';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -62,6 +62,9 @@ interface GenerateIdeasParams {
   propertyNames: string[];
   ideaLane: IdeaLane;
   techModifiers?: TechModifier[];
+  audienceModifier?: AudienceModifier;
+  platformModifier?: PlatformModifier;
+  budgetTier?: BudgetTier;
   numIdeas: number;
   documentContext?: string;
   outputStyle?: OutputStyle;
@@ -142,12 +145,64 @@ const OUTPUT_STYLE_PROMPTS: Record<OutputStyleType, { name: string; base: string
   }
 };
 
+// Detailed guidance for each technology modifier
+const TECH_MODIFIER_GUIDANCE: Record<TechModifier, string> = {
+  'AI': 'Artificial intelligence, machine learning, personalization engines, predictive analytics, chatbots, recommendation systems',
+  'VR': 'Virtual reality—immersive environments, 360° experiences, headsets, virtual venues, simulated experiences',
+  'AR': 'Augmented reality—mobile overlays, Snap/Instagram filters, real-world digital enhancement, interactive displays',
+  'Web3': 'Blockchain, NFTs, token-gated access, digital collectibles, cryptocurrency rewards, decentralized ownership',
+  'Wearables': 'Smartwatches, fitness bands, haptic devices, connected apparel, biometric tracking',
+  'Voice': 'Voice assistants (Alexa, Google Home), audio interfaces, voice-activated experiences, smart speakers',
+  'Drones': 'Aerial photography, drone delivery, synchronized light shows, crowd capture, sky-writing',
+  'NFC/RFID': 'Tap-to-interact, contactless engagement, smart credentials, proximity triggers, digital keepsakes',
+};
+
+// Detailed guidance for each audience modifier
+const AUDIENCE_MODIFIER_GUIDANCE: Record<AudienceModifier, string> = {
+  'gen_z': 'Ages 13–27; mobile-first, short-form video natives, value authenticity over polish, socially conscious, meme-literate, expect participation not passive consumption',
+  'millennials': 'Ages 28–43; digitally savvy, nostalgic for \'90s/\'00s culture, experience-driven over material goods, balancing career and family, appreciate quality and purpose',
+  'families': 'Multi-generational appeal, kid-friendly mechanics, shared experiences for parents and children together, convenience and accessibility, wholesome engagement',
+  'superfans': 'Deep devotees who collect memorabilia, travel to events, and prioritize fandom; reward with exclusivity, insider access, early drops, and recognition',
+  'casual_fans': 'Light engagement, attracted by major moments and cultural buzz; lower-commitment tactics, broad appeal, easy on-ramps, shareable content',
+  'b2b_corporate': 'Hospitality clients, suite holders, corporate partners; emphasize ROI, relationship-building, premium touchpoints, business value, networking opportunities',
+};
+
+// Detailed guidance for each platform modifier
+const PLATFORM_MODIFIER_GUIDANCE: Record<PlatformModifier, string> = {
+  'tiktok': 'Short-form vertical video (15-60s optimal), trending sounds and hashtags, creator collaborations, duets & stitches, authentic lo-fi aesthetic, challenge mechanics',
+  'instagram': 'Reels, Stories, carousel posts, influencer partnerships, aesthetic polish, grid-worthy visuals, DM engagement, shopping integration',
+  'youtube': 'Long-form content & Shorts, creator integrations, pre-roll opportunities, episodic series, searchable content, community engagement',
+  'twitch': 'Live streaming, real-time chat interaction, streamer partnerships, raids & drops, subscriber perks, gaming and IRL content',
+  'x': 'Real-time conversation, hashtag campaigns, quote tweets, trending moments, breaking news tie-ins, community engagement, spaces',
+  'snapchat': 'AR lenses, Discover content, ephemeral stories, quick shareable moments, younger demo skew, location-based features',
+  'discord': 'Community servers, AMAs, exclusive member channels, gamer and creator communities, bot integrations, persistent community building',
+};
+
+// Detailed guidance for each budget tier
+const BUDGET_TIER_GUIDANCE: Record<BudgetTier, { label: string; description: string }> = {
+  'scrappy': {
+    label: 'Scrappy (Under $50K)',
+    description: 'Guerrilla tactics, user-generated content, low-production social content, organic community building, grassroots activations, creative partnerships over paid media',
+  },
+  'mid_tier': {
+    label: 'Mid-Tier ($50K–$500K)',
+    description: 'Quality production values, targeted influencer partnerships, localized or regional experiences, strategic paid media, professional creative execution',
+  },
+  'flagship': {
+    label: 'Flagship ($500K+)',
+    description: 'Broadcast-quality creative, celebrity or major athlete talent, stadium-level activations, national/international campaigns, integrated media buys, tentpole moments',
+  },
+};
+
 function buildUserPrompt(params: GenerateIdeasParams): string {
   const {
     clientName,
     propertyNames,
     ideaLane,
     techModifiers,
+    audienceModifier,
+    platformModifier,
+    budgetTier,
     numIdeas,
     documentContext,
     outputStyle,
@@ -171,7 +226,27 @@ PROPERTY/PARTNER: ${propertyNames.join(', ')}
 IDEA LANE: ${laneLabels[ideaLane]}`;
 
   if (techModifiers && techModifiers.length > 0) {
-    prompt += `\nTECHNOLOGY FOCUS: ${techModifiers.join(', ')}`;
+    const techDetails = techModifiers.map(mod => `${mod}: ${TECH_MODIFIER_GUIDANCE[mod]}`).join('\n  - ');
+    prompt += `\n\nTECHNOLOGY FOCUS: Incorporate these technologies naturally into the activation concepts:
+  - ${techDetails}
+Ideas should leverage these technologies in innovative ways that enhance the experience, not feel forced or gimmicky.`;
+  }
+
+  if (audienceModifier) {
+    prompt += `\n\nTARGET AUDIENCE: ${AUDIENCE_MODIFIER_GUIDANCE[audienceModifier]}
+Tailor the idea's tone, channels, creative approach, and mechanics specifically for this demographic. Consider their media consumption habits, values, and engagement preferences.`;
+  }
+
+  if (platformModifier) {
+    prompt += `\n\nPLATFORM FOCUS: ${PLATFORM_MODIFIER_GUIDANCE[platformModifier]}
+Optimize the idea for this platform's native format, culture, and best practices. Consider platform-specific mechanics, content formats, and engagement patterns.`;
+  }
+
+  if (budgetTier) {
+    const budgetInfo = BUDGET_TIER_GUIDANCE[budgetTier];
+    prompt += `\n\nBUDGET TIER: ${budgetInfo.label}
+${budgetInfo.description}
+Calibrate the idea's scope, complexity, and production requirements to be realistic and achievable within this budget range.`;
   }
 
   // Add Social Impact lane specific guidance
