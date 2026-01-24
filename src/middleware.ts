@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AUTH_COOKIE_NAME } from '@/lib/auth';
-import jwt from 'jsonwebtoken';
+import { jwtVerify } from 'jose';
 
+const AUTH_COOKIE_NAME = 'idea_machine_auth';
 const JWT_SECRET = process.env.JWT_SECRET || 'idea-machine-secret-key-change-in-production';
 
 interface JWTPayload {
@@ -11,7 +11,7 @@ interface JWTPayload {
   role: 'admin' | 'user';
 }
 
-function verifyTokenFromCookie(request: NextRequest): JWTPayload | null {
+async function verifyTokenFromCookie(request: NextRequest): Promise<JWTPayload | null> {
   const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
 
   if (!token) {
@@ -19,7 +19,9 @@ function verifyTokenFromCookie(request: NextRequest): JWTPayload | null {
   }
 
   try {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload;
+    const secret = new TextEncoder().encode(JWT_SECRET);
+    const { payload } = await jwtVerify(token, secret);
+    return payload as unknown as JWTPayload;
   } catch {
     return null;
   }
@@ -31,7 +33,7 @@ const publicRoutes = ['/login', '/api/auth/login'];
 // Routes that require admin role
 const adminRoutes = ['/admin'];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip API routes except auth-related ones that need protection
@@ -42,7 +44,7 @@ export function middleware(request: NextRequest) {
   // Allow public routes
   if (publicRoutes.some(route => pathname.startsWith(route))) {
     // If already logged in and trying to access login, redirect to home
-    const user = verifyTokenFromCookie(request);
+    const user = await verifyTokenFromCookie(request);
     if (user && pathname === '/login') {
       return NextResponse.redirect(new URL('/', request.url));
     }
@@ -50,7 +52,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Check authentication for protected routes
-  const user = verifyTokenFromCookie(request);
+  const user = await verifyTokenFromCookie(request);
 
   if (!user) {
     // Not logged in, redirect to login
