@@ -16,7 +16,7 @@ import {
   formatDocumentsForPrompt,
   truncateText,
 } from '@/lib/documents';
-import type { IdeaLane, TechModifier, ContentStyle, IdeaInsert, OutputStyle } from '@/types/database';
+import type { IdeaLane, TechModifier, IdeaInsert, OutputStyle } from '@/types/database';
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,8 +31,6 @@ export async function POST(request: NextRequest) {
 
     const tech_modifiers_str = formData.get('tech_modifiers') as string | null;
     const tech_modifiers = tech_modifiers_str ? JSON.parse(tech_modifiers_str) as TechModifier[] : undefined;
-
-    const content_style = formData.get('content_style') as ContentStyle | null;
 
     const output_style_str = formData.get('output_style') as string | null;
     const output_style = output_style_str ? JSON.parse(output_style_str) as OutputStyle : undefined;
@@ -138,7 +136,6 @@ export async function POST(request: NextRequest) {
       propertyNames: properties.map((p) => p.name),
       ideaLane: idea_lane,
       techModifiers: tech_modifiers,
-      contentStyle: content_style || undefined,
       numIdeas: num_ideas,
       documentContext: documentContext || undefined,
       outputStyle: output_style,
@@ -153,7 +150,7 @@ export async function POST(request: NextRequest) {
       property_ids,
       idea_lane,
       tech_modifiers: tech_modifiers || null,
-      content_style: content_style || null,
+      content_style: null,
       num_ideas,
       user_id: authUser?.id || null,
       name: session_name || null,
