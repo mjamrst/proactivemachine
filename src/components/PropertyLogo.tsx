@@ -394,6 +394,32 @@ const PROPERTY_DOMAINS: Record<string, string> = {
   'St. Louis City SC': 'stlcitysc.com',
   'Toronto FC': 'torontofc.ca',
   'Vancouver Whitecaps FC': 'whitecapsfc.com',
+
+  // NASCAR Teams
+  'Hendrick Motorsports': 'hendrickmotorsports.com',
+  'Joe Gibbs Racing': 'joegibbsracing.com',
+  'Team Penske': 'teampenske.com',
+  'RFK Racing': 'rfkracing.com',
+  'Roush Fenway Keselowski Racing': 'rfkracing.com',
+  '23XI Racing': '23xiracing.com',
+  'Trackhouse Racing': 'trackhouseracingteam.com',
+  'Richard Childress Racing': 'rcrracing.com',
+  'RCR': 'rcrracing.com',
+  'Spire Motorsports': 'spiremotorsports.com',
+  'Legacy Motor Club': 'legacymotorclub.com',
+  'Petty GMS': 'legacymotorclub.com',
+  'Kaulig Racing': 'kauligracing.com',
+  'Wood Brothers Racing': 'woodbrothersracing.com',
+  'Front Row Motorsports': 'frontrowmotorsports.com',
+  'JTG Daugherty Racing': 'jtgdaughertyracing.com',
+  'Stewart-Haas Racing': 'stewarthaasracing.com',
+  'Haas Factory Team': 'stewarthaasracing.com',
+  'Rick Ware Racing': 'rickwareracing.com',
+  'Chip Ganassi Racing': 'chipganassiracing.com',
+  'Furniture Row Racing': 'furniturerowracing.com',
+  'Leavine Family Racing': 'lfracing.com',
+  'Go Fas Racing': 'gofasracing.com',
+  'Germain Racing': 'germainracing.com',
 };
 
 export function PropertyLogo({ name, size = 'sm', className = '' }: PropertyLogoProps) {
