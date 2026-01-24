@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { ClientLogo } from '@/components/ClientLogo';
 import type { IdeaSessionWithDetails } from '@/types/database';
 
 interface SearchResult {
@@ -346,6 +347,7 @@ export function HistoryClient({ sessions: initialSessions }: HistoryClientProps)
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
+                    <ClientLogo name={clientName} size="md" />
                     <h3 className="text-lg font-semibold text-foreground">{clientName}</h3>
                     <span className="px-2 py-0.5 bg-accent/10 text-accent text-xs font-medium rounded">
                       {sessionsByClient[clientName].length} session{sessionsByClient[clientName].length !== 1 ? 's' : ''}

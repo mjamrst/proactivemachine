@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Idea } from '@/types/database';
 
 interface IdeaCardProps {
@@ -15,12 +15,20 @@ export function IdeaCard({ idea, index, onUpdate }: IdeaCardProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Local display state (synced with prop)
+  const [displayIdea, setDisplayIdea] = useState(idea);
+
   // Edit state
   const [editTitle, setEditTitle] = useState(idea.title);
   const [editOverview, setEditOverview] = useState(idea.overview);
   const [editFeatures, setEditFeatures] = useState(idea.features);
   const [editBrandFit, setEditBrandFit] = useState(idea.brand_fit);
   const [editImagePrompt, setEditImagePrompt] = useState(idea.image_prompt);
+
+  // Sync display state when prop changes
+  useEffect(() => {
+    setDisplayIdea(idea);
+  }, [idea]);
 
   const handleStartEdit = () => {
     setEditTitle(idea.title);
@@ -61,6 +69,9 @@ export function IdeaCard({ idea, index, onUpdate }: IdeaCardProps) {
       }
 
       const { idea: updatedIdea } = await response.json();
+
+      // Update local display state immediately
+      setDisplayIdea(updatedIdea);
 
       if (onUpdate) {
         onUpdate(updatedIdea);
@@ -118,12 +129,12 @@ export function IdeaCard({ idea, index, onUpdate }: IdeaCardProps) {
                 className="w-full text-xl font-bold text-foreground bg-background border border-card-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
               />
             ) : (
-              <h3 className="text-xl font-bold text-foreground">{idea.title}</h3>
+              <h3 className="text-xl font-bold text-foreground">{displayIdea.title}</h3>
             )}
           </div>
-          {idea.figma_frame_id && !isEditing && (
+          {displayIdea.figma_frame_id && !isEditing && (
             <a
-              href={`#figma-${idea.figma_frame_id}`}
+              href={`#figma-${displayIdea.figma_frame_id}`}
               className="flex items-center gap-1 text-sm text-accent hover:underline"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -143,7 +154,7 @@ export function IdeaCard({ idea, index, onUpdate }: IdeaCardProps) {
             className="mt-3 w-full text-muted bg-background border border-card-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent resize-none"
           />
         ) : (
-          <p className="mt-3 text-muted leading-relaxed">{idea.overview}</p>
+          <p className="mt-3 text-muted leading-relaxed">{displayIdea.overview}</p>
         )}
       </div>
 
@@ -187,7 +198,7 @@ export function IdeaCard({ idea, index, onUpdate }: IdeaCardProps) {
               </div>
             ) : (
               <ul className="space-y-2">
-                {idea.features.map((feature, i) => (
+                {displayIdea.features.map((feature, i) => (
                   <li key={i} className="flex items-start gap-2 text-muted">
                     <svg
                       className="w-5 h-5 text-accent flex-shrink-0 mt-0.5"
@@ -222,7 +233,7 @@ export function IdeaCard({ idea, index, onUpdate }: IdeaCardProps) {
                 className="w-full text-foreground bg-background border border-card-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent resize-none"
               />
             ) : (
-              <p className="text-foreground">{idea.brand_fit}</p>
+              <p className="text-foreground">{displayIdea.brand_fit}</p>
             )}
           </div>
 
@@ -239,7 +250,7 @@ export function IdeaCard({ idea, index, onUpdate }: IdeaCardProps) {
                 className="w-full text-sm text-muted bg-background border border-card-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent resize-none"
               />
             ) : (
-              <p className="text-sm text-muted italic">{idea.image_prompt}</p>
+              <p className="text-sm text-muted italic">{displayIdea.image_prompt}</p>
             )}
           </div>
 
