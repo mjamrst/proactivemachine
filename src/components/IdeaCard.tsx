@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Idea } from '@/types/database';
+import { IdeaRating } from './IdeaRating';
 
 interface IdeaCardProps {
   idea: Idea;
@@ -281,6 +282,11 @@ export function IdeaCard({ idea, index, onUpdate }: IdeaCardProps) {
                 {isSaving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
+          )}
+
+          {/* Idea Rating */}
+          {!isEditing && (
+            <IdeaRating ideaId={idea.id} />
           )}
         </div>
       </div>

@@ -216,3 +216,64 @@ export interface GenerateIdeasResponse {
   session_id: string;
   ideas: Idea[];
 }
+
+// Idea Ratings
+export type IdeaRatingValue = 1 | 2 | 3;
+
+export interface IdeaRating {
+  id: string;
+  idea_id: string;
+  user_id: string;
+  rating: IdeaRatingValue;
+  comment: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IdeaRatingInsert {
+  idea_id: string;
+  rating: IdeaRatingValue;
+  comment?: string | null;
+}
+
+export interface IdeaRatingWithUser extends IdeaRating {
+  user_display_name: string;
+  username: string;
+}
+
+// Rating Analytics Types
+export interface RatingSummary {
+  total_ratings: number;
+  one_star_count: number;
+  two_star_count: number;
+  three_star_count: number;
+  average_rating: number;
+}
+
+export interface RatingByLane extends RatingSummary {
+  idea_lane: IdeaLane;
+}
+
+export interface RatingByOutputStyle extends RatingSummary {
+  output_style: OutputStyleType | null;
+}
+
+export interface RatingAnalytics {
+  summary: RatingSummary;
+  byLane: RatingByLane[];
+  byOutputStyle: RatingByOutputStyle[];
+  recentRatings: IdeaRatingWithDetails[];
+}
+
+export interface IdeaRatingWithDetails {
+  rating_id: string;
+  rating: IdeaRatingValue;
+  comment: string | null;
+  rated_at: string;
+  idea_id: string;
+  idea_title: string;
+  session_id: string;
+  idea_lane: IdeaLane;
+  client_name: string;
+  rater_display_name: string;
+}
