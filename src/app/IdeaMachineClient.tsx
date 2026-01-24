@@ -54,6 +54,9 @@ export function IdeaMachineClient() {
       // Use FormData to support file uploads
       const formData = new FormData();
       formData.append('client_id', data.clientId);
+      if (data.sessionName) {
+        formData.append('session_name', data.sessionName);
+      }
       formData.append('property_ids', JSON.stringify(data.propertyIds));
       formData.append('idea_lane', data.ideaLane);
       if (data.techModifiers.length > 0) {

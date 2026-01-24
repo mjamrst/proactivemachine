@@ -19,6 +19,7 @@ interface IdeaGeneratorFormProps {
 
 export interface GenerateFormData {
   clientId: string;
+  sessionName: string;
   propertyIds: string[];
   ideaLane: IdeaLane;
   techModifiers: TechModifier[];
@@ -35,6 +36,7 @@ export function IdeaGeneratorForm({
   isGenerating,
 }: IdeaGeneratorFormProps) {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [sessionName, setSessionName] = useState<string>('');
   const [selectedPropertyIds, setSelectedPropertyIds] = useState<string[]>([]);
   const [selectedLane, setSelectedLane] = useState<IdeaLane | null>(null);
   const [techModifiers, setTechModifiers] = useState<TechModifier[]>([]);
@@ -86,6 +88,7 @@ export function IdeaGeneratorForm({
 
     await onGenerate({
       clientId: selectedClientId!,
+      sessionName: sessionName.trim(),
       propertyIds: selectedPropertyIds,
       ideaLane: selectedLane!,
       techModifiers,
@@ -129,6 +132,23 @@ export function IdeaGeneratorForm({
         {errors.client && (
           <p className="mt-1 text-sm text-error">{errors.client}</p>
         )}
+      </div>
+
+      {/* Session Name */}
+      <div>
+        <label className="block text-sm font-medium text-foreground mb-2">
+          Session Name <span className="text-muted font-normal">(optional)</span>
+        </label>
+        <input
+          type="text"
+          value={sessionName}
+          onChange={(e) => setSessionName(e.target.value)}
+          placeholder="e.g., Q1 Campaign Ideas, Product Launch Concepts..."
+          className="w-full px-4 py-3 bg-background border border-card-border rounded-lg text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+        />
+        <p className="mt-1 text-xs text-muted">
+          Give this session a name to easily find it later in your history
+        </p>
       </div>
 
       {/* Property Selector */}

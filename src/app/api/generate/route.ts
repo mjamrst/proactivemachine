@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
 
     const client_id = formData.get('client_id') as string;
+    const session_name = formData.get('session_name') as string | null;
     const property_ids = JSON.parse(formData.get('property_ids') as string) as string[];
     const idea_lane = formData.get('idea_lane') as IdeaLane;
     const num_ideas = parseInt(formData.get('num_ideas') as string, 10);
@@ -151,6 +152,7 @@ export async function POST(request: NextRequest) {
       content_style: content_style || null,
       num_ideas,
       user_id: authUser?.id || null,
+      name: session_name || null,
     });
 
     // Save generated ideas to database
