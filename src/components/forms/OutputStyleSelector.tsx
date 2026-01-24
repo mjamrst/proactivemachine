@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import type { OutputStyleType, OutputStyle } from '@/types/database';
 
 interface OutputStyleSelectorProps {
@@ -77,8 +76,6 @@ const INTENSITY_LABELS = [
 ];
 
 export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   const handleSelectStyle = (type: OutputStyleType) => {
     if (value?.type === type) {
       // Deselect if clicking the same one
@@ -98,22 +95,13 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">Output Style</h3>
-          <p className="text-sm text-muted">Choose a personality for your ideas</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="text-sm text-accent hover:text-accent-hover transition-colors"
-        >
-          {isExpanded ? 'Collapse' : 'Expand'}
-        </button>
+      <div>
+        <h3 className="text-lg font-semibold text-foreground">Output Style</h3>
+        <p className="text-sm text-muted">Choose a personality for your ideas</p>
       </div>
 
       {/* Style Cards */}
-      <div className={`grid gap-3 ${isExpanded ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5'}`}>
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {STYLE_PROFILES.map((profile) => {
           const isSelected = value?.type === profile.type;
           return (
@@ -138,11 +126,9 @@ export function OutputStyleSelector({ value, onChange }: OutputStyleSelectorProp
                   <h4 className={`font-semibold truncate ${isSelected ? 'text-accent' : 'text-foreground'}`}>
                     {profile.name}
                   </h4>
-                  {isExpanded && (
-                    <p className="text-xs text-muted mt-1 line-clamp-2">
-                      {profile.description}
-                    </p>
-                  )}
+                  <p className="text-xs text-muted mt-1 line-clamp-2">
+                    {profile.description}
+                  </p>
                 </div>
               </div>
 
