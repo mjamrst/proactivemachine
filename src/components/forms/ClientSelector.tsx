@@ -12,6 +12,12 @@ interface ClientSelectorProps {
   onAddClient: (name: string, domain?: string) => Promise<Client>;
 }
 
+interface RecentClient {
+  id: string;
+  name: string;
+  domain: string | null;
+}
+
 export function ClientSelector({
   clients,
   selectedClientId,
@@ -25,7 +31,16 @@ export function ClientSelector({
   const [newClientDomain, setNewClientDomain] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState('');
+  const [recentClients, setRecentClients] = useState<RecentClient[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fetch recently used clients
+  useEffect(() => {
+    fetch('/api/clients/recent')
+      .then((res) => res.json())
+      .then((data) => setRecentClients(data.clients || []))
+      .catch(() => setRecentClients([]));
+  }, []);
 
   const selectedClient = clients.find((c) => c.id === selectedClientId);
 
@@ -157,6 +172,30 @@ export function ClientSelector({
           </div>
         )}
       </div>
+
+      {/* Recently Used Clients */}
+      {recentClients.length > 0 && (
+        <div className="mt-4">
+          <p className="text-sm text-muted mb-2">Recently Used Clients</p>
+          <div className="flex flex-wrap gap-2">
+            {recentClients.map((client) => (
+              <button
+                key={client.id}
+                type="button"
+                onClick={() => onSelect(client.id)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
+                  client.id === selectedClientId
+                    ? 'border-accent bg-accent/10 text-accent'
+                    : 'border-card-border bg-card-bg hover:border-muted text-foreground'
+                }`}
+              >
+                <ClientLogo domain={client.domain} name={client.name} size="sm" />
+                <span className="text-sm">{client.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Add Client Modal */}
       <Modal
