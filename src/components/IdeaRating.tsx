@@ -191,7 +191,7 @@ export function IdeaRating({ ideaId }: IdeaRatingProps) {
               onChange={(e) => setComment(e.target.value)}
               onBlur={handleCommentSave}
               placeholder="What specifically did you like or dislike about this idea?"
-              className="w-full px-3 py-2 bg-[#f7f7f5] border border-gray-200 rounded-lg text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
+              className="w-full px-3 py-2 bg-background border border-card-border rounded-lg text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
               rows={2}
               disabled={isSaving}
             />

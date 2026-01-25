@@ -190,7 +190,7 @@ export function IdeaLaneSelector({
                 className={`relative flex flex-col items-center text-center cursor-pointer rounded-xl border-2 p-4 transition-all ${
                   isSelected
                     ? 'border-accent bg-accent/5 shadow-lg scale-[1.02]'
-                    : 'border-gray-200 bg-[#f7f7f5] hover:border-gray-300 hover:bg-gray-100'
+                    : 'border-card-border bg-background hover:border-muted'
                 }`}
               >
                 <input
@@ -258,7 +258,7 @@ export function IdeaLaneSelector({
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                       techModifiers.includes(modifier.value)
                         ? 'bg-accent text-white'
-                        : 'bg-[#f7f7f5] border border-gray-200 text-foreground hover:border-gray-300'
+                        : 'bg-background border border-card-border text-foreground hover:border-muted'
                     }`}
                   >
                     {modifier.label}
@@ -282,7 +282,7 @@ export function IdeaLaneSelector({
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     audienceModifier === modifier.value
                       ? 'bg-accent text-white'
-                      : 'bg-[#f7f7f5] border border-gray-200 text-foreground hover:border-gray-300'
+                      : 'bg-background border border-card-border text-foreground hover:border-muted'
                   }`}
                 >
                   {modifier.label}
@@ -305,7 +305,7 @@ export function IdeaLaneSelector({
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     platformModifier === modifier.value
                       ? 'bg-accent text-white'
-                      : 'bg-[#f7f7f5] border border-gray-200 text-foreground hover:border-gray-300'
+                      : 'bg-background border border-card-border text-foreground hover:border-muted'
                   }`}
                 >
                   {modifier.label}
@@ -328,7 +328,7 @@ export function IdeaLaneSelector({
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     budgetTier === tier.value
                       ? 'bg-accent text-white'
-                      : 'bg-[#f7f7f5] border border-gray-200 text-foreground hover:border-gray-300'
+                      : 'bg-background border border-card-border text-foreground hover:border-muted'
                   }`}
                 >
                   {tier.label} <span className="opacity-70">({tier.description})</span>

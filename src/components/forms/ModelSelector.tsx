@@ -49,7 +49,7 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
               className={`relative flex flex-col text-left p-4 rounded-xl border-2 transition-all ${
                 isSelected
                   ? 'border-accent bg-accent/5 shadow-lg'
-                  : 'border-gray-200 bg-[#f7f7f5] hover:border-gray-300 hover:bg-gray-100'
+                  : 'border-card-border bg-background hover:border-muted'
               }`}
             >
               {/* Selection indicator */}
@@ -66,7 +66,7 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
                 <span className={`inline-flex self-start px-2 py-0.5 text-xs font-medium rounded-full mb-2 ${
                   isSelected
                     ? 'bg-accent text-white'
-                    : 'bg-gray-200 text-gray-600'
+                    : 'bg-card-border text-muted'
                 }`}>
                   {model.badge}
                 </span>

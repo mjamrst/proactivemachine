@@ -37,7 +37,7 @@ export interface GenerateFormData {
 // Reusable section wrapper component
 function Section({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-white rounded-xl p-6 shadow-sm ${className}`}>
+    <div className={`bg-card-bg rounded-xl p-6 shadow-sm ${className}`}>
       {children}
     </div>
   );
@@ -161,7 +161,7 @@ export function IdeaGeneratorForm({
           value={sessionName}
           onChange={(e) => setSessionName(e.target.value)}
           placeholder="e.g., Q1 Campaign Ideas, Product Launch Concepts..."
-          className="w-full px-4 py-3 bg-[#f7f7f5] border border-gray-200 rounded-lg text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+          className="w-full px-4 py-3 bg-background border border-card-border rounded-lg text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
         />
         <p className="mt-2 text-xs text-muted">
           Give this session a name to easily find it later in your history
