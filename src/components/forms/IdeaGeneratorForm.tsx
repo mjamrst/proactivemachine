@@ -6,9 +6,10 @@ import { PropertySelector } from './PropertySelector';
 import { IdeaLaneSelector } from './IdeaLaneSelector';
 import { NumberOfIdeasSelector } from './NumberOfIdeasSelector';
 import { OutputStyleSelector } from './OutputStyleSelector';
+import { ModelSelector } from './ModelSelector';
 import { DocumentUploader } from './DocumentUploader';
 import { Button } from '@/components/ui';
-import type { Client, Property, IdeaLane, TechModifier, AudienceModifier, PlatformModifier, BudgetTier, ClientDocument, OutputStyle } from '@/types/database';
+import type { Client, Property, IdeaLane, TechModifier, AudienceModifier, PlatformModifier, BudgetTier, ClientDocument, OutputStyle, AIModel } from '@/types/database';
 
 interface IdeaGeneratorFormProps {
   clients: Client[];
@@ -29,6 +30,7 @@ export interface GenerateFormData {
   budgetTier: BudgetTier | null;
   numIdeas: number;
   outputStyle: OutputStyle | null;
+  model: AIModel;
   sessionFiles: File[];
 }
 
@@ -58,6 +60,7 @@ export function IdeaGeneratorForm({
   const [budgetTier, setBudgetTier] = useState<BudgetTier | null>(null);
   const [numIdeas, setNumIdeas] = useState(5);
   const [outputStyle, setOutputStyle] = useState<OutputStyle | null>(null);
+  const [selectedModel, setSelectedModel] = useState<AIModel>('claude');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [clientDocuments, setClientDocuments] = useState<ClientDocument[]>([]);
   const [sessionFiles, setSessionFiles] = useState<File[]>([]);
@@ -109,6 +112,7 @@ export function IdeaGeneratorForm({
       budgetTier,
       numIdeas,
       outputStyle,
+      model: selectedModel,
       sessionFiles,
     });
   };
@@ -207,6 +211,11 @@ export function IdeaGeneratorForm({
       {/* Output Style */}
       <Section>
         <OutputStyleSelector value={outputStyle} onChange={setOutputStyle} />
+      </Section>
+
+      {/* AI Model Selector */}
+      <Section>
+        <ModelSelector value={selectedModel} onChange={setSelectedModel} />
       </Section>
 
       {/* Document Uploader */}

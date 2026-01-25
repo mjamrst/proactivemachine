@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { generateIdeas } from '@/lib/claude';
+import { generateIdeas } from '@/lib/generate-ideas';
 import { getAuthUser } from '@/lib/auth';
 import {
   getClientById,
@@ -16,7 +16,7 @@ import {
   formatDocumentsForPrompt,
   truncateText,
 } from '@/lib/documents';
-import type { IdeaLane, TechModifier, AudienceModifier, PlatformModifier, BudgetTier, IdeaInsert, OutputStyle } from '@/types/database';
+import type { IdeaLane, TechModifier, AudienceModifier, PlatformModifier, BudgetTier, IdeaInsert, OutputStyle, AIModel } from '@/types/database';
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,6 +39,8 @@ export async function POST(request: NextRequest) {
     const output_style_str = formData.get('output_style') as string | null;
     const output_style = output_style_str ? JSON.parse(output_style_str) as OutputStyle : undefined;
 
+    const model = (formData.get('model') as AIModel) || 'claude';
+
     const session_file_count = parseInt(formData.get('session_file_count') as string || '0', 10);
 
     // Validate required fields
@@ -53,14 +55,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Number of ideas must be between 1 and 10' },
         { status: 400 }
-      );
-    }
-
-    // Check for API key
-    if (!process.env.ANTHROPIC_API_KEY) {
-      return NextResponse.json(
-        { error: 'Anthropic API key not configured' },
-        { status: 500 }
       );
     }
 
@@ -134,7 +128,7 @@ export async function POST(request: NextRequest) {
     // Format documents for prompt
     const documentContext = formatDocumentsForPrompt(documentContents);
 
-    // Generate ideas using Claude
+    // Generate ideas using selected AI model
     const generatedIdeas = await generateIdeas({
       clientName: client.name,
       propertyNames: properties.map((p) => p.name),
@@ -146,6 +140,7 @@ export async function POST(request: NextRequest) {
       numIdeas: num_ideas,
       documentContext: documentContext || undefined,
       outputStyle: output_style,
+      model,
     });
 
     // Get current user
@@ -161,6 +156,7 @@ export async function POST(request: NextRequest) {
       platform_modifier: platform_modifier || null,
       budget_tier: budget_tier || null,
       content_style: null,
+      ai_model: model,
       num_ideas,
       user_id: authUser?.id || null,
       name: session_name || null,

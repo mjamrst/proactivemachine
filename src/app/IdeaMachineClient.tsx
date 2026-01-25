@@ -75,6 +75,7 @@ export function IdeaMachineClient() {
       if (data.outputStyle) {
         formData.append('output_style', JSON.stringify(data.outputStyle));
       }
+      formData.append('model', data.model);
 
       // Append session files
       data.sessionFiles.forEach((file, index) => {

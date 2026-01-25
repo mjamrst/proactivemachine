@@ -68,6 +68,8 @@ export interface OutputStyle {
   intensity: number; // 1-5
 }
 
+export type AIModel = 'claude' | 'palmyra-creative';
+
 // Database row types
 export interface Client {
   id: string;
@@ -98,6 +100,7 @@ export interface IdeaSession {
   platform_modifier: PlatformModifier | null;
   budget_tier: BudgetTier | null;
   content_style: ContentStyle | null;
+  ai_model: AIModel | null;
   num_ideas: number;
   user_id: string | null;
   name: string | null;
@@ -166,6 +169,7 @@ export interface IdeaSessionInsert {
   platform_modifier?: PlatformModifier | null;
   budget_tier?: BudgetTier | null;
   content_style?: ContentStyle | null;
+  ai_model?: AIModel | null;
   num_ideas: number;
   user_id?: string | null;
   name?: string | null;
