@@ -31,6 +31,7 @@ export function HistoryClient({ sessions: initialSessions }: HistoryClientProps)
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
+  const [hasInitializedExpanded, setHasInitializedExpanded] = useState(false);
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>('');
 
@@ -97,10 +98,11 @@ export function HistoryClient({ sessions: initialSessions }: HistoryClientProps)
 
   // Initialize all clients as expanded on first render
   useEffect(() => {
-    if (expandedClients.size === 0 && sortedClients.length > 0) {
+    if (!hasInitializedExpanded && sortedClients.length > 0) {
       setExpandedClients(new Set(sortedClients));
+      setHasInitializedExpanded(true);
     }
-  }, [sortedClients, expandedClients.size]);
+  }, [sortedClients, hasInitializedExpanded]);
 
   const toggleClient = (clientName: string) => {
     setExpandedClients(prev => {
