@@ -219,7 +219,7 @@ export function IdeaLaneSelector({
                         src={lane.image}
                         alt={lane.label}
                         fill
-                        className="object-contain dark:invert"
+                        className="object-contain"
                       />
                     </div>
                   ) : (
