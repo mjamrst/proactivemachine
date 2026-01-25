@@ -13,7 +13,7 @@ export default function Home() {
             <img
               src="/hero_image_v4.png"
               alt="Sports and Entertainment"
-              className="mx-auto mb-6 h-32 w-auto"
+              className="mx-auto mb-8 max-w-2xl w-full"
             />
             <h2 className="text-4xl font-bold mb-4">
               Generate Partnership Activation Ideas
