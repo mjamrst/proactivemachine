@@ -17,7 +17,7 @@ export function Header({ currentPage }: HeaderProps) {
           <img
             src="/primer-logo.png"
             alt="Primer"
-            className="h-12 w-auto"
+            className="h-20 w-auto"
           />
         </a>
         <div className="flex items-center gap-4">

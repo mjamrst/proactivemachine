@@ -42,7 +42,7 @@ function LoginForm() {
             <img
               src="/primer-logo.png"
               alt="Primer"
-              className="h-16 w-auto mx-auto mb-4"
+              className="h-32 w-auto mx-auto mb-4"
             />
             <p className="text-muted text-sm">
               Sign in to continue
