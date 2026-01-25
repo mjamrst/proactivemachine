@@ -64,10 +64,10 @@ ANTHROPIC_API_KEY=your-api-key`}
 
       {/* About */}
       <section className="bg-card-bg border border-card-border rounded-xl p-6">
-        <h2 className="text-xl font-semibold mb-4">About Idea Machine</h2>
+        <h2 className="text-xl font-semibold mb-4">About Primer</h2>
         <p className="text-muted mb-4">
-          Idea Machine is an internal ideation tool for brand consulting teams. It helps generate
-          creative sponsorship activation ideas using AI and exports them as presentation-ready slides.
+          Primer is an AI-powered ideation tool that primes your creative process. It helps generate
+          sponsorship activation ideas using AI and exports them as presentation-ready slides.
         </p>
         <div className="grid sm:grid-cols-2 gap-4 text-sm">
           <div className="p-4 bg-background rounded-lg">

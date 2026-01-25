@@ -1,6 +1,6 @@
-# Idea Machine
+# Primer
 
-Internal ideation tool for generating sponsorship activation ideas using AI. Built for partnership teams to brainstorm creative concepts for brand-property partnerships.
+AI-powered ideation tool that primes your creative process for sponsorship activations. Built for partnership teams to generate creative concepts for brand-property partnerships.
 
 ## Tech Stack
 

@@ -189,7 +189,7 @@ export function PresentationView({
               <p className="idea-count">{ideas.length} Creative Concepts</p>
             </div>
             <div className="branding">
-              <span className="brand-text">Idea Machine</span>
+              <span className="brand-text">Primer</span>
             </div>
           </div>
         </div>
@@ -310,7 +310,7 @@ export function PresentationView({
               </div>
             </div>
             <div className="branding">
-              <span className="brand-text">Powered by Idea Machine</span>
+              <span className="brand-text">Powered by Primer</span>
             </div>
           </div>
         </div>

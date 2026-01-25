@@ -1,4 +1,4 @@
--- Idea Machine Seed Data
+-- Primer Seed Data
 -- Run this after schema.sql to populate the database
 
 -- ============================================

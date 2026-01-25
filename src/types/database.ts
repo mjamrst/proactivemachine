@@ -1,4 +1,4 @@
-// Database types for Idea Machine
+// Database types for Primer
 
 export type PropertyCategory =
   | 'league'

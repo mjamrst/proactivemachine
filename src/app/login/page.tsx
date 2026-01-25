@@ -40,7 +40,7 @@ function LoginForm() {
           {/* Logo/Title */}
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-foreground mb-2">
-              Idea Machine
+              Primer
             </h1>
             <p className="text-muted text-sm">
               Sign in to continue

@@ -1,4 +1,4 @@
-// Database helper functions for Idea Machine
+// Database helper functions for Primer
 
 import { SupabaseClient } from '@supabase/supabase-js';
 import type {

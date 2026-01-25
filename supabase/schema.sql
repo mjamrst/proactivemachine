@@ -1,4 +1,4 @@
--- Idea Machine Database Schema
+-- Primer Database Schema
 -- Run this in Supabase SQL Editor to create all tables
 
 -- Enable UUID extension

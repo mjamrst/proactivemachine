@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Idea Machine | Sponsorship Activation Ideas",
-  description: "Generate creative sponsorship activation ideas and export them to Figma presentations",
+  title: "Primer | AI-Powered Activation Ideas",
+  description: "Prime your creative process with AI-generated sponsorship activation ideas",
 };
 
 export default function RootLayout({

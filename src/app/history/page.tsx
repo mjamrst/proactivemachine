@@ -33,7 +33,7 @@ export default async function HistoryPage() {
       {/* Footer */}
       <footer className="border-t border-card-border px-6 py-4">
         <div className="max-w-7xl mx-auto text-center text-muted text-sm">
-          Idea Machine - Internal Ideation Tool
+          Primer - AI-Powered Activation Ideas
         </div>
       </footer>
     </div>

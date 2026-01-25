@@ -14,7 +14,7 @@ export function Header({ currentPage }: HeaderProps) {
     <header className="border-b border-card-border px-6 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <a href="/" className="text-2xl font-bold">
-          <span className="text-accent">Idea</span> Machine
+          <span className="text-accent">Primer</span>
         </a>
         <div className="flex items-center gap-4">
           <nav className="flex gap-4">

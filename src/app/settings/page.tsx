@@ -16,7 +16,7 @@ export default function SettingsPage() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Settings</h1>
             <p className="text-muted">
-              Configure your Idea Machine instance
+              Configure your Primer instance
             </p>
           </div>
 
@@ -30,7 +30,7 @@ export default function SettingsPage() {
       {/* Footer */}
       <footer className="border-t border-card-border px-6 py-4">
         <div className="max-w-7xl mx-auto text-center text-muted text-sm">
-          Idea Machine - Internal Ideation Tool
+          Primer - AI-Powered Activation Ideas
         </div>
       </footer>
     </div>
