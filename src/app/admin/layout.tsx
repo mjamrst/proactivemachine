@@ -1,7 +1,6 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/lib/auth-context';
 
 const navItems = [
@@ -54,8 +53,8 @@ export default function AdminLayout({
       <aside className="w-64 bg-card-bg border-r border-card-border flex flex-col">
         {/* Logo */}
         <div className="p-6 border-b border-card-border">
-          <a href="/" className="text-xl font-bold">
-            <span className="text-accent">Idea</span> Machine
+          <a href="/" className="flex items-center">
+            <img src="/primer-logo.png" alt="Primer" className="h-8 w-auto" />
           </a>
           <p className="text-xs text-muted mt-1">Admin Panel</p>
         </div>
@@ -131,7 +130,6 @@ export default function AdminLayout({
           <h1 className="text-lg font-semibold text-foreground">
             {navItems.find((item) => pathname.startsWith(item.href))?.label || 'Admin'}
           </h1>
-          <ThemeToggle />
         </header>
 
         {/* Page Content */}

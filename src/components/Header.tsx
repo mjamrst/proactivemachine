@@ -1,6 +1,5 @@
 'use client';
 
-import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '@/lib/auth-context';
 
 interface HeaderProps {
@@ -79,7 +78,6 @@ export function Header({ currentPage }: HeaderProps) {
                 </button>
               </div>
             )}
-            <ThemeToggle />
           </div>
         </div>
       </div>

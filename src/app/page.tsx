@@ -10,6 +10,11 @@ export default function Home() {
       <main className="flex-1 px-6 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
+            <img
+              src="/hero_image_v4.png"
+              alt="Sports and Entertainment"
+              className="mx-auto mb-6 h-32 w-auto"
+            />
             <h2 className="text-4xl font-bold mb-4">
               Generate Partnership Activation Ideas
             </h2>
