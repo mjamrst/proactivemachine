@@ -190,7 +190,7 @@ export function IdeaLaneSelector({
                 className={`relative flex flex-col items-center text-center cursor-pointer rounded-xl border-2 p-4 transition-all ${
                   isSelected
                     ? 'border-accent bg-accent/5 shadow-lg scale-[1.02]'
-                    : 'border-card-border bg-background hover:border-muted'
+                    : 'border-card-border bg-[#F5F5F5] dark:bg-card-bg hover:border-muted'
                 }`}
               >
                 <input
