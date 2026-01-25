@@ -7,9 +7,35 @@ AI-powered ideation tool that primes your creative process for sponsorship activ
 - **Framework**: Next.js 16 (App Router) with React 19
 - **Language**: TypeScript
 - **Database**: Supabase (PostgreSQL)
-- **Styling**: Tailwind CSS 4
+- **Styling**: Tailwind CSS 4 (light mode only)
 - **AI Models**: Claude (Anthropic) and Palmyra Creative (Writer)
 - **Auth**: Custom JWT-based authentication with bcrypt
+
+## Public Assets
+
+```
+public/
+├── hero_image_v4.png       # Homepage hero illustration
+├── primer-icon.png         # App icon
+├── primer-logo.png         # Logo for header/login
+├── characters/             # Output style character illustrations
+│   ├── creative_strategist_character.png
+│   ├── data_nerd_character.png
+│   ├── gen_z_coded_character.png
+│   ├── no_sauce_character.png
+│   ├── sports_expert_character.png
+│   ├── tech_bro_character.png
+│   └── world_traveler_character.png
+└── lanes/                  # Idea lane icons
+    ├── content.png
+    ├── digital.png
+    ├── gaming_esports.png
+    ├── hospitality_vip.png
+    ├── live_experience.png
+    ├── retail_product.png
+    ├── social_impact.png
+    └── talent_athlete.png
+```
 
 ## Project Structure
 
@@ -151,9 +177,11 @@ npm run lint     # Run ESLint
 
 ## Styling Notes
 
-- Uses CSS variables for theming (see `globals.css`)
-- Card backgrounds: `bg-card-bg` or `bg-white`
-- Borders: `border-card-border` or `border-gray-200`
+- Light mode only (no dark mode toggle)
+- Uses CSS variables defined in `globals.css`
+- Card backgrounds: `bg-card-bg`
+- Borders: `border-card-border`
 - Accent color: `bg-accent`, `text-accent`
+- Lane selector tiles: `bg-[#F5F5F5]`
 - Form sections use white cards with `rounded-xl p-6 shadow-sm`
 - Headers use `text-lg font-semibold text-foreground`
