@@ -39,9 +39,11 @@ function LoginForm() {
         <div className="bg-card-bg border border-card-border rounded-xl p-8 shadow-lg">
           {/* Logo/Title */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-foreground mb-2">
-              Primer
-            </h1>
+            <img
+              src="/primer-logo.png"
+              alt="Primer"
+              className="h-10 w-auto mx-auto mb-4"
+            />
             <p className="text-muted text-sm">
               Sign in to continue
             </p>
