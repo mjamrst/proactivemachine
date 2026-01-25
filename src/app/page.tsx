@@ -14,8 +14,8 @@ export default function Home() {
               Generate Partnership Activation Ideas
             </h2>
             <p className="text-muted text-lg max-w-2xl mx-auto">
-              Select a client, properties, and idea lane to generate creative
-              partnership activation concepts that export directly to Figma.
+              Select a client, properties, an idea lane, and output style to
+              generate thought starters and new ideas for our clients.
             </p>
           </div>
 
