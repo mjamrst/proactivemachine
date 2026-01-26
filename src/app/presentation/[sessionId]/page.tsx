@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getIdeaSessionById, getIdeasBySession, getClientById, getPropertiesByIds } from '@/lib/supabase/db';
 import { notFound } from 'next/navigation';
 import { PresentationView } from './PresentationView';
+import './presentation.css';
 
 interface PageProps {
   params: Promise<{ sessionId: string }>;
