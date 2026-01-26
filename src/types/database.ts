@@ -68,7 +68,7 @@ export interface OutputStyle {
   intensity: number; // 1-5
 }
 
-export type AIModel = 'claude' | 'palmyra-creative';
+export type AIModel = 'claude' | 'palmyra-creative' | 'gemini';
 
 // Database row types
 export interface Client {

@@ -30,6 +30,13 @@ const MODELS: ModelConfig[] = [
     description: 'Optimized for creative brainstorming and fresh concepts',
     badge: 'Creative',
   },
+  {
+    id: 'gemini',
+    name: 'Gemini Pro',
+    provider: 'Google',
+    description: 'Fast, versatile model with strong reasoning capabilities',
+    badge: 'New',
+  },
 ];
 
 export function ModelSelector({ value, onChange }: ModelSelectorProps) {
@@ -38,7 +45,7 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
       <h3 className="text-lg font-semibold text-foreground">AI Model</h3>
       <p className="text-sm text-muted">Choose which AI generates your ideas</p>
 
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 mt-3">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-3 mt-3">
         {MODELS.map((model) => {
           const isSelected = value === model.id;
           return (

@@ -1,6 +1,7 @@
 import type { GeneratedIdea, IdeaLane, TechModifier, AudienceModifier, PlatformModifier, BudgetTier, OutputStyle, AIModel } from '@/types/database';
 import { generateIdeas as generateIdeasWithClaude } from './claude';
 import { generateIdeasWithWriter } from './writer';
+import { generateIdeasWithGemini } from './gemini';
 
 export interface GenerateIdeasParams {
   clientName: string;
@@ -30,9 +31,17 @@ export async function generateIdeas(
     throw new Error('Writer API key not configured');
   }
 
+  if (model === 'gemini' && !process.env.GOOGLE_AI_API_KEY) {
+    throw new Error('Google AI API key not configured');
+  }
+
   // Route to the appropriate model
   if (model === 'palmyra-creative') {
     return generateIdeasWithWriter(generateParams);
+  }
+
+  if (model === 'gemini') {
+    return generateIdeasWithGemini(generateParams);
   }
 
   // Default to Claude
@@ -40,4 +49,4 @@ export async function generateIdeas(
 }
 
 // Export individual generators for direct access if needed
-export { generateIdeasWithClaude, generateIdeasWithWriter };
+export { generateIdeasWithClaude, generateIdeasWithWriter, generateIdeasWithGemini };
