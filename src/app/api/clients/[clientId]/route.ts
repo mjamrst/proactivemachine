@@ -78,6 +78,53 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
   }
 }
 
+// PUT /api/clients/[clientId] - Update a client (admin only)
+export async function PUT(request: NextRequest, { params }: RouteParams) {
+  try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Only admins can update clients
+    if (user.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const { clientId } = await params;
+    const { name, domain } = await request.json();
+
+    if (!name || name.trim().length === 0) {
+      return NextResponse.json({ error: 'Client name is required' }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+
+    // Update the client
+    const { data: client, error: updateError } = await supabase
+      .from('clients')
+      .update({
+        name: name.trim(),
+        domain: domain?.trim() || null,
+      })
+      .eq('id', clientId)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    return NextResponse.json({ client });
+  } catch (error) {
+    console.error('Update client error:', error);
+    return NextResponse.json(
+      { error: 'Failed to update client' },
+      { status: 500 }
+    );
+  }
+}
+
 // GET /api/clients/[clientId] - Get a single client
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {

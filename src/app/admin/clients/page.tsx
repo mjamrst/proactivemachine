@@ -17,6 +17,10 @@ export default function AdminClientsPage() {
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editDomain, setEditDomain] = useState('');
+  const [savingId, setSavingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchClients();
@@ -32,6 +36,59 @@ export default function AdminClientsPage() {
       setError(err instanceof Error ? err.message : 'Failed to load clients');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const startEditing = (client: Client) => {
+    setEditingId(client.id);
+    setEditName(client.name);
+    setEditDomain(client.domain || '');
+    setConfirmDelete(null);
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditName('');
+    setEditDomain('');
+  };
+
+  const handleSave = async (clientId: string) => {
+    if (!editName.trim()) {
+      setError('Client name is required');
+      return;
+    }
+
+    setSavingId(clientId);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/clients/${clientId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editName.trim(),
+          domain: editDomain.trim() || null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update client');
+      }
+
+      setClients(clients.map(c =>
+        c.id === clientId
+          ? { ...c, name: data.client.name, domain: data.client.domain }
+          : c
+      ));
+      setEditingId(null);
+      setEditName('');
+      setEditDomain('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update client');
+    } finally {
+      setSavingId(null);
     }
   };
 
@@ -110,13 +167,32 @@ export default function AdminClientsPage() {
             {clients.map((client) => (
               <tr key={client.id} className="border-b border-card-border last:border-b-0 hover:bg-card-border/30">
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <ClientLogo domain={client.domain} name={client.name} size="md" />
-                    <span className="font-medium text-foreground">{client.name}</span>
-                  </div>
+                  {editingId === client.id ? (
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-card-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                      placeholder="Client name"
+                      autoFocus
+                    />
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <ClientLogo domain={client.domain} name={client.name} size="md" />
+                      <span className="font-medium text-foreground">{client.name}</span>
+                    </div>
+                  )}
                 </td>
                 <td className="px-6 py-4">
-                  {client.domain ? (
+                  {editingId === client.id ? (
+                    <input
+                      type="text"
+                      value={editDomain}
+                      onChange={(e) => setEditDomain(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-card-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                      placeholder="example.com"
+                    />
+                  ) : client.domain ? (
                     <span className="text-sm text-muted">{client.domain}</span>
                   ) : (
                     <span className="text-sm text-muted/50">—</span>
@@ -131,7 +207,23 @@ export default function AdminClientsPage() {
                   <span className="text-sm text-muted">{formatDate(client.created_at)}</span>
                 </td>
                 <td className="px-6 py-4 text-right">
-                  {confirmDelete === client.id ? (
+                  {editingId === client.id ? (
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => handleSave(client.id)}
+                        disabled={savingId === client.id}
+                        className="px-3 py-1.5 text-sm bg-accent text-white rounded-lg hover:bg-accent-hover disabled:opacity-50 transition-colors"
+                      >
+                        {savingId === client.id ? 'Saving...' : 'Save'}
+                      </button>
+                      <button
+                        onClick={cancelEditing}
+                        className="px-3 py-1.5 text-sm bg-card-border text-foreground rounded-lg hover:bg-muted/20 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : confirmDelete === client.id ? (
                     <div className="flex items-center justify-end gap-2">
                       <span className="text-sm text-muted mr-2">Delete?</span>
                       <button
@@ -149,14 +241,22 @@ export default function AdminClientsPage() {
                       </button>
                     </div>
                   ) : (
-                    <button
-                      onClick={() => setConfirmDelete(client.id)}
-                      disabled={client.session_count > 0}
-                      className="px-3 py-1.5 text-sm text-error hover:bg-error/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                      title={client.session_count > 0 ? 'Cannot delete client with existing sessions' : 'Delete client'}
-                    >
-                      Delete
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => startEditing(client)}
+                        className="px-3 py-1.5 text-sm text-accent hover:bg-accent/10 rounded-lg transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => setConfirmDelete(client.id)}
+                        disabled={client.session_count > 0}
+                        className="px-3 py-1.5 text-sm text-error hover:bg-error/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        title={client.session_count > 0 ? 'Cannot delete client with existing sessions' : 'Delete client'}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   )}
                 </td>
               </tr>
