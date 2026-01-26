@@ -37,6 +37,27 @@ export function PresentationView({
     window.print();
   };
 
+  const handleDownloadPptx = async () => {
+    try {
+      const response = await fetch(`/api/sessions/${session.id}/export-pptx`);
+      if (!response.ok) {
+        throw new Error('Failed to generate PowerPoint');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${client.name.replace(/[^a-zA-Z0-9]/g, '_')}_Ideas.pptx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to download PowerPoint. Please try again.');
+    }
+  };
+
   const handleImageClick = (ideaId: string) => {
     if (uploadingIds.has(ideaId)) return;
     const input = fileInputRefs.current.get(ideaId);
@@ -156,6 +177,15 @@ export function PresentationView({
         >
           Back to App
         </a>
+        <button
+          onClick={handleDownloadPptx}
+          className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+          Download PPTX
+        </button>
         <button
           onClick={handlePrint}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
