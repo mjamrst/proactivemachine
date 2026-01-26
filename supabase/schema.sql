@@ -135,18 +135,28 @@ SELECT
 FROM properties p
 LEFT JOIN properties parent ON p.parent_id = parent.id;
 
--- View for idea sessions with client names
+-- View for idea sessions with client names and user info
 CREATE VIEW idea_sessions_with_details AS
 SELECT
   s.id,
   s.client_id,
   c.name AS client_name,
+  c.domain AS client_domain,
   s.property_ids,
   s.idea_lane,
   s.tech_modifiers,
+  s.audience_modifier,
+  s.platform_modifier,
+  s.budget_tier,
   s.content_style,
+  s.ai_model,
   s.num_ideas,
+  s.user_id,
+  s.name,
+  u.username,
+  u.display_name AS user_display_name,
   s.created_at,
   (SELECT COUNT(*) FROM ideas WHERE session_id = s.id) AS ideas_count
 FROM idea_sessions s
-JOIN clients c ON s.client_id = c.id;
+JOIN clients c ON s.client_id = c.id
+LEFT JOIN users u ON s.user_id = u.id;
