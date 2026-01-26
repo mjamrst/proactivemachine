@@ -34,6 +34,7 @@ export function HistoryClient({ sessions: initialSessions }: HistoryClientProps)
   const [hasInitializedExpanded, setHasInitializedExpanded] = useState(false);
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>('');
+  const [presentationMenuOpen, setPresentationMenuOpen] = useState<string | null>(null);
 
   // Debounced search
   const performSearch = useCallback(async (query: string) => {
@@ -456,14 +457,47 @@ export function HistoryClient({ sessions: initialSessions }: HistoryClientProps)
                             >
                               View Ideas
                             </a>
-                            <a
-                              href={`/presentation/${session.id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover transition-colors"
-                            >
-                              Presentation
-                            </a>
+                            <div className="relative">
+                              <button
+                                onClick={() => setPresentationMenuOpen(presentationMenuOpen === session.id ? null : session.id)}
+                                className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover transition-colors flex items-center gap-1"
+                              >
+                                Presentation
+                                <svg className={`w-4 h-4 transition-transform ${presentationMenuOpen === session.id ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </button>
+                              {presentationMenuOpen === session.id && (
+                                <>
+                                  <div
+                                    className="fixed inset-0 z-40"
+                                    onClick={() => setPresentationMenuOpen(null)}
+                                  />
+                                  <div className="absolute right-0 mt-2 w-40 bg-card-bg border border-card-border rounded-lg shadow-xl overflow-hidden z-50">
+                                    <a
+                                      href={`/presentation/${session.id}?theme=dark`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={() => setPresentationMenuOpen(null)}
+                                      className="w-full px-4 py-3 text-left text-foreground hover:bg-card-border transition-colors flex items-center gap-3"
+                                    >
+                                      <span className="w-4 h-4 rounded-full bg-gray-900 border border-gray-600" />
+                                      Dark Mode
+                                    </a>
+                                    <a
+                                      href={`/presentation/${session.id}?theme=light`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={() => setPresentationMenuOpen(null)}
+                                      className="w-full px-4 py-3 text-left text-foreground hover:bg-card-border transition-colors flex items-center gap-3"
+                                    >
+                                      <span className="w-4 h-4 rounded-full bg-white border border-gray-300" />
+                                      Light Mode
+                                    </a>
+                                  </div>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>

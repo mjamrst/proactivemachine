@@ -6,10 +6,13 @@ import './presentation.css';
 
 interface PageProps {
   params: Promise<{ sessionId: string }>;
+  searchParams: Promise<{ theme?: string }>;
 }
 
-export default async function PresentationPage({ params }: PageProps) {
+export default async function PresentationPage({ params, searchParams }: PageProps) {
   const { sessionId } = await params;
+  const { theme } = await searchParams;
+  const presentationTheme = theme === 'light' ? 'light' : 'dark';
   const supabase = await createClient();
 
   // Fetch session data
@@ -35,6 +38,7 @@ export default async function PresentationPage({ params }: PageProps) {
       client={client}
       properties={properties}
       session={session}
+      theme={presentationTheme}
     />
   );
 }

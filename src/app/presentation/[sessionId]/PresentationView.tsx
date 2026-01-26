@@ -8,6 +8,7 @@ interface PresentationViewProps {
   client: Client;
   properties: Property[];
   session: IdeaSession;
+  theme?: 'dark' | 'light';
 }
 
 export function PresentationView({
@@ -15,6 +16,7 @@ export function PresentationView({
   client,
   properties,
   session,
+  theme = 'dark',
 }: PresentationViewProps) {
   const presentationRef = useRef<HTMLDivElement>(null);
   const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
@@ -225,7 +227,7 @@ export function PresentationView({
       </div>
 
       {/* Presentation Container */}
-      <div ref={presentationRef} className="presentation-container">
+      <div ref={presentationRef} className={`presentation-container theme-${theme}`}>
         {/* Title Slide */}
         <div className="slide title-slide">
           <div className="slide-content">
