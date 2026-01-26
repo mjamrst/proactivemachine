@@ -32,9 +32,9 @@ const MODELS: ModelConfig[] = [
   },
   {
     id: 'gemini',
-    name: 'Gemini Flash',
+    name: 'Gemini 3 Pro',
     provider: 'Google',
-    description: 'Fast, versatile model with strong reasoning capabilities',
+    description: 'Google\'s most capable model with advanced reasoning',
     badge: 'New',
   },
 ];
