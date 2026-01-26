@@ -13,6 +13,7 @@ interface ModelConfig {
   provider: string;
   description: string;
   badge?: string;
+  logo: string;
 }
 
 const MODELS: ModelConfig[] = [
@@ -22,6 +23,7 @@ const MODELS: ModelConfig[] = [
     provider: 'Anthropic',
     description: 'Balanced performance for structured, detailed ideas',
     badge: 'Default',
+    logo: '/claude-logo.png',
   },
   {
     id: 'palmyra-creative',
@@ -29,6 +31,7 @@ const MODELS: ModelConfig[] = [
     provider: 'Writer',
     description: 'Optimized for creative brainstorming and fresh concepts',
     badge: 'Creative',
+    logo: '/palmyra-logo.png',
   },
   {
     id: 'gemini',
@@ -36,6 +39,7 @@ const MODELS: ModelConfig[] = [
     provider: 'Google',
     description: 'Google\'s most capable model with advanced reasoning',
     badge: 'New',
+    logo: '/gemini-logo.png',
   },
 ];
 
@@ -67,6 +71,15 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
                   </svg>
                 </div>
               )}
+
+              {/* Logo */}
+              <div className="w-10 h-10 mb-3">
+                <img
+                  src={model.logo}
+                  alt={model.provider}
+                  className="w-full h-full object-contain"
+                />
+              </div>
 
               {/* Badge */}
               {model.badge && (
