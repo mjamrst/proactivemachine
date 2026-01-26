@@ -71,6 +71,9 @@ export function IdeaMachineClient() {
       if (data.budgetTier) {
         formData.append('budget_tier', data.budgetTier);
       }
+      if (data.talentNames && data.talentNames.length > 0) {
+        formData.append('talent_names', JSON.stringify(data.talentNames));
+      }
       formData.append('num_ideas', data.numIdeas.toString());
       if (data.outputStyle) {
         formData.append('output_style', JSON.stringify(data.outputStyle));

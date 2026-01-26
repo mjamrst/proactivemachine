@@ -11,6 +11,7 @@ export interface GenerateIdeasParams {
   audienceModifier?: AudienceModifier;
   platformModifier?: PlatformModifier;
   budgetTier?: BudgetTier;
+  talentNames?: string[];
   numIdeas: number;
   documentContext?: string;
   outputStyle?: OutputStyle;

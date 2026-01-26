@@ -28,6 +28,7 @@ export interface GenerateFormData {
   audienceModifier: AudienceModifier | null;
   platformModifier: PlatformModifier | null;
   budgetTier: BudgetTier | null;
+  talentNames: string[];
   numIdeas: number;
   outputStyle: OutputStyle | null;
   model: AIModel;
@@ -61,6 +62,7 @@ export function IdeaGeneratorForm({
   const [numIdeas, setNumIdeas] = useState(5);
   const [outputStyle, setOutputStyle] = useState<OutputStyle | null>(null);
   const [selectedModel, setSelectedModel] = useState<AIModel>('claude');
+  const [talentNames, setTalentNames] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [clientDocuments, setClientDocuments] = useState<ClientDocument[]>([]);
   const [sessionFiles, setSessionFiles] = useState<File[]>([]);
@@ -101,6 +103,12 @@ export function IdeaGeneratorForm({
 
     if (!validateForm()) return;
 
+    // Parse talent names from comma-separated string
+    const parsedTalentNames = talentNames
+      .split(',')
+      .map(name => name.trim())
+      .filter(name => name.length > 0);
+
     await onGenerate({
       clientId: selectedClientId!,
       sessionName: sessionName.trim(),
@@ -110,6 +118,7 @@ export function IdeaGeneratorForm({
       audienceModifier,
       platformModifier,
       budgetTier,
+      talentNames: parsedTalentNames,
       numIdeas,
       outputStyle,
       model: selectedModel,
@@ -122,6 +131,10 @@ export function IdeaGeneratorForm({
     // Reset tech modifiers when switching to content lane (no tech modifiers for content)
     if (lane === 'content') {
       setTechModifiers([]);
+    }
+    // Clear talent names when switching away from talent_athlete lane
+    if (lane !== 'talent_athlete') {
+      setTalentNames('');
     }
     // Clear lane-related errors
     setErrors((prev) => {
@@ -201,6 +214,28 @@ export function IdeaGeneratorForm({
           onBudgetTierChange={setBudgetTier}
         />
         {errors.lane && <p className="mt-2 text-sm text-error">{errors.lane}</p>}
+
+        {/* Talent Names Input - shown when talent_athlete lane is selected */}
+        {selectedLane === 'talent_athlete' && (
+          <div className="mt-6 pt-6 border-t border-card-border">
+            <h4 className="text-base font-semibold text-foreground mb-2">
+              Featured Talent/Athletes
+            </h4>
+            <p className="text-sm text-muted mb-3">
+              Enter the names of athletes, creators, or talent to feature in your activation ideas
+            </p>
+            <input
+              type="text"
+              value={talentNames}
+              onChange={(e) => setTalentNames(e.target.value)}
+              placeholder="e.g., LeBron James, Serena Williams, MrBeast"
+              className="w-full px-4 py-3 bg-background border border-card-border rounded-lg text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+            />
+            <p className="mt-2 text-xs text-muted">
+              Separate multiple names with commas
+            </p>
+          </div>
+        )}
       </Section>
 
       {/* Number of Ideas */}

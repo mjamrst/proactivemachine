@@ -36,6 +36,9 @@ export async function POST(request: NextRequest) {
     const platform_modifier = formData.get('platform_modifier') as PlatformModifier | null;
     const budget_tier = formData.get('budget_tier') as BudgetTier | null;
 
+    const talent_names_str = formData.get('talent_names') as string | null;
+    const talent_names = talent_names_str ? JSON.parse(talent_names_str) as string[] : undefined;
+
     const output_style_str = formData.get('output_style') as string | null;
     const output_style = output_style_str ? JSON.parse(output_style_str) as OutputStyle : undefined;
 
@@ -137,6 +140,7 @@ export async function POST(request: NextRequest) {
       audienceModifier: audience_modifier || undefined,
       platformModifier: platform_modifier || undefined,
       budgetTier: budget_tier || undefined,
+      talentNames: talent_names,
       numIdeas: num_ideas,
       documentContext: documentContext || undefined,
       outputStyle: output_style,

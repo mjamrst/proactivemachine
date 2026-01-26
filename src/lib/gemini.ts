@@ -40,6 +40,7 @@ interface GenerateIdeasParams {
   audienceModifier?: AudienceModifier;
   platformModifier?: PlatformModifier;
   budgetTier?: BudgetTier;
+  talentNames?: string[];
   numIdeas: number;
   documentContext?: string;
   outputStyle?: OutputStyle;
@@ -178,6 +179,7 @@ function buildUserPrompt(params: GenerateIdeasParams): string {
     audienceModifier,
     platformModifier,
     budgetTier,
+    talentNames,
     numIdeas,
     documentContext,
     outputStyle,
@@ -236,6 +238,22 @@ Calibrate the idea's scope, complexity, and production requirements to be realis
 - Youth development and mentorship
 
 Ideas should demonstrate meaningful brand commitment (not just cause marketing), create tangible community benefit, and leverage the property partnership to amplify social good. Think about how the brand can show up as a force for positive change while maintaining authenticity.`;
+  }
+
+  // Add Talent/Athlete specific guidance with named talent
+  if (ideaLane === 'talent_athlete' && talentNames && talentNames.length > 0) {
+    const talentList = talentNames.join(', ');
+    prompt += `\n\nFEATURED TALENT: ${talentList}
+
+IMPORTANT: All activation ideas MUST prominently feature and be built around the specified talent/athlete(s). Consider:
+- Their unique personality, brand, and public persona
+- Their specific sport/field, achievements, and cultural relevance
+- Their existing brand partnerships and how they align with the client
+- Their social media presence and fan engagement style
+- Content formats and platforms where they're most authentic
+- Ways to leverage their story, background, or signature moments
+
+Each idea should feel tailor-made for these specific individuals, not generic talent activations. The talent should be central to the concept, not just an add-on endorsement.`;
   }
 
   if (documentContext) {
