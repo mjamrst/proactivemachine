@@ -4,6 +4,17 @@ All notable changes to Primer (formerly Idea Machine) are documented below.
 
 ---
 
+## v1.5.1 - Optional Properties & Changelog (February 14, 2026)
+
+### New Features
+- **Changelog Page** - Browse the full version history directly on the website
+
+### Improvements
+- **Optional Properties** - Properties/Partners are no longer required when generating ideas, allowing activations for a client without selecting a specific property
+- Form, API routes, AI prompts, presentation view, and PowerPoint export all gracefully handle sessions with no properties
+
+---
+
 ## v1.5.0 - Export & Presentation Upgrades (January 25, 2026)
 
 ### New Features

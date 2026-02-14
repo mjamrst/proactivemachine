@@ -14,6 +14,26 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: '1.5.1',
+    date: 'February 14, 2026',
+    title: 'Optional Properties & Changelog',
+    sections: [
+      {
+        heading: 'New Features',
+        items: [
+          'Changelog Page - Browse the full version history directly on the website',
+        ],
+      },
+      {
+        heading: 'Improvements',
+        items: [
+          'Optional Properties - Properties/Partners are no longer required when generating ideas, allowing activations for a client without selecting a specific property',
+          'Form, API routes, AI prompts, presentation view, and PowerPoint export all gracefully handle sessions with no properties',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.5.0',
     date: 'January 25, 2026',
     title: 'Export & Presentation Upgrades',
