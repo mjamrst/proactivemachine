@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/auth-context';
 
 interface HeaderProps {
-  currentPage?: 'home' | 'settings' | 'history';
+  currentPage?: 'home' | 'settings' | 'history' | 'changelog';
 }
 
 export function Header({ currentPage }: HeaderProps) {
@@ -40,6 +40,16 @@ export function Header({ currentPage }: HeaderProps) {
               }`}
             >
               History
+            </a>
+            <a
+              href="/changelog"
+              className={`transition-colors ${
+                currentPage === 'changelog'
+                  ? 'text-accent font-medium'
+                  : 'text-muted hover:text-foreground'
+              }`}
+            >
+              Changelog
             </a>
             {isAdmin && (
               <a

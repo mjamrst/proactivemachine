@@ -28,7 +28,7 @@ async function verifyTokenFromCookie(request: NextRequest): Promise<JWTPayload |
 }
 
 // Routes that don't require authentication
-const publicRoutes = ['/login', '/api/auth/login'];
+const publicRoutes = ['/login', '/api/auth/login', '/changelog'];
 
 // Routes that require admin role
 const adminRoutes = ['/admin'];
