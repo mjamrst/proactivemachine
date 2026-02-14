@@ -201,9 +201,13 @@ function buildUserPrompt(params: GenerateIdeasParams): string {
 
   let prompt = `Generate ${numIdeas} distinct sponsorship activation ideas for:
 
-CLIENT: ${clientName}
-PROPERTY/PARTNER: ${propertyNames.join(', ')}
-IDEA LANE: ${laneLabels[ideaLane]}`;
+CLIENT: ${clientName}`;
+
+  if (propertyNames.length > 0) {
+    prompt += `\nPROPERTY/PARTNER: ${propertyNames.join(', ')}`;
+  }
+
+  prompt += `\nIDEA LANE: ${laneLabels[ideaLane]}`;
 
   if (techModifiers && techModifiers.length > 0) {
     const techDetails = techModifiers.map(mod => `${mod}: ${TECH_MODIFIER_GUIDANCE[mod]}`).join('\n  - ');

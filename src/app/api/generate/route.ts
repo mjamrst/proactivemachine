@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
 
     const session_file_count = parseInt(formData.get('session_file_count') as string || '0', 10);
 
-    // Validate required fields
-    if (!client_id || !property_ids || !idea_lane || !num_ideas) {
+    // Validate required fields (property_ids is optional)
+    if (!client_id || !idea_lane || !num_ideas) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -66,20 +66,13 @@ export async function POST(request: NextRequest) {
     // Fetch client and properties from database
     const [client, properties, clientDocuments] = await Promise.all([
       getClientById(supabase, client_id),
-      getPropertiesByIds(supabase, property_ids),
+      property_ids.length > 0 ? getPropertiesByIds(supabase, property_ids) : Promise.resolve([]),
       getClientDocuments(supabase, client_id),
     ]);
 
     if (!client) {
       return NextResponse.json(
         { error: 'Client not found' },
-        { status: 404 }
-      );
-    }
-
-    if (properties.length === 0) {
-      return NextResponse.json(
-        { error: 'No valid properties found' },
         { status: 404 }
       );
     }

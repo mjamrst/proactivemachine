@@ -108,7 +108,7 @@ export function PropertySelector({
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-foreground">
-          Properties / Partners
+          Properties / Partners <span className="text-muted font-normal text-sm">(optional)</span>
         </h3>
         {selectedCount > 0 && (
           <span className="text-xs text-accent">{selectedCount} selected</span>

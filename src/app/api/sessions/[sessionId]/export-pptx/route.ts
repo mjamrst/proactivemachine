@@ -42,7 +42,9 @@ export async function GET(
     const [ideas, client, properties] = await Promise.all([
       getIdeasBySession(supabase, sessionId),
       getClientById(supabase, session.client_id),
-      getPropertiesByIds(supabase, session.property_ids),
+      session.property_ids.length > 0
+        ? getPropertiesByIds(supabase, session.property_ids)
+        : Promise.resolve([]),
     ]);
 
     if (!client) {
@@ -85,18 +87,20 @@ export async function GET(
       fontFace: 'Arial',
     });
 
-    // Properties
-    const propertiesText = properties.map((p) => p.name).join(' + ');
-    titleSlide.addText(propertiesText, {
-      x: 0.5,
-      y: 3.5,
-      w: '90%',
-      h: 0.5,
-      fontSize: 20,
-      color: COLORS.gray,
-      align: 'center',
-      fontFace: 'Arial',
-    });
+    // Properties (only if there are properties)
+    if (properties.length > 0) {
+      const propertiesText = properties.map((p) => p.name).join(' + ');
+      titleSlide.addText(propertiesText, {
+        x: 0.5,
+        y: 3.5,
+        w: '90%',
+        h: 0.5,
+        fontSize: 20,
+        color: COLORS.gray,
+        align: 'center',
+        fontFace: 'Arial',
+      });
+    }
 
     // Lane badge and tech modifiers
     const laneLabel = LANE_LABELS[session.idea_lane] || session.idea_lane;
@@ -379,7 +383,9 @@ export async function GET(
       fontFace: 'Arial',
     });
 
-    const endMeta = `${client.name} × ${properties.map((p) => p.name).join(', ')}`;
+    const endMeta = properties.length > 0
+      ? `${client.name} × ${properties.map((p) => p.name).join(', ')}`
+      : client.name;
     endSlide.addText(endMeta, {
       x: 0.5,
       y: 4.3,

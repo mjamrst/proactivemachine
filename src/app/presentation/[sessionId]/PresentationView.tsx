@@ -234,9 +234,11 @@ export function PresentationView({
             <div className="title-content">
               <p className="subtitle">Sponsorship Activation Ideas</p>
               <h1 className="main-title">{client.name}</h1>
-              <div className="properties-list">
-                {properties.map((p) => p.name).join(' + ')}
-              </div>
+              {properties.length > 0 && (
+                <div className="properties-list">
+                  {properties.map((p) => p.name).join(' + ')}
+                </div>
+              )}
               <div className="meta-info">
                 <span className="lane-badge">{laneLabels[session.idea_lane]}</span>
                 {session.tech_modifiers && session.tech_modifiers.length > 0 && (
@@ -358,7 +360,7 @@ export function PresentationView({
               <h2>Thank You</h2>
               <p className="end-subtitle">Ready to bring these ideas to life?</p>
               <div className="end-meta">
-                <p>{client.name} × {properties.map((p) => p.name).join(', ')}</p>
+                <p>{client.name}{properties.length > 0 ? ` × ${properties.map((p) => p.name).join(', ')}` : ''}</p>
                 <p className="generated-date">
                   Generated {new Date(session.created_at).toLocaleDateString('en-US', {
                     year: 'numeric',

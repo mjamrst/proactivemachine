@@ -86,10 +86,6 @@ export function IdeaGeneratorForm({
       newErrors.client = 'Please select a client';
     }
 
-    if (selectedPropertyIds.length === 0) {
-      newErrors.properties = 'Please select at least one property';
-    }
-
     if (!selectedLane) {
       newErrors.lane = 'Please select an idea lane';
     }
@@ -186,17 +182,8 @@ export function IdeaGeneratorForm({
         <PropertySelector
           properties={properties}
           selectedIds={selectedPropertyIds}
-          onChange={(ids) => {
-            setSelectedPropertyIds(ids);
-            setErrors((prev) => {
-              const { properties: _, ...rest } = prev;
-              return rest;
-            });
-          }}
+          onChange={setSelectedPropertyIds}
         />
-        {errors.properties && (
-          <p className="mt-2 text-sm text-error">{errors.properties}</p>
-        )}
       </Section>
 
       {/* Idea Lane Selector */}
