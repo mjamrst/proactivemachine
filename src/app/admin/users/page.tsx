@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Button, Input, Modal } from '@/components/ui';
 
-type Office = 'LA' | 'New York' | 'Munich' | 'UK' | 'Singapore' | 'Washington DC' | 'Dallas';
+type Office = 'LA' | 'New York' | 'Munich' | 'UK' | 'Singapore' | 'Washington DC' | 'Dallas' | 'Atlanta' | 'Jacksonville';
 
-const OFFICES: Office[] = ['LA', 'New York', 'Munich', 'UK', 'Singapore', 'Washington DC', 'Dallas'];
+const OFFICES: Office[] = ['LA', 'New York', 'Munich', 'UK', 'Singapore', 'Washington DC', 'Dallas', 'Atlanta', 'Jacksonville'];
 
 interface User {
   id: string;

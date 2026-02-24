@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const validOffices = ['LA', 'New York', 'Munich', 'UK', 'Singapore', 'Washington DC', 'Dallas'];
+    const validOffices = ['LA', 'New York', 'Munich', 'UK', 'Singapore', 'Washington DC', 'Dallas', 'Atlanta', 'Jacksonville'];
     if (office && !validOffices.includes(office)) {
       return NextResponse.json(
         { error: 'Invalid office location' },
