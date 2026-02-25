@@ -62,8 +62,9 @@ src/
 │   └── *.tsx              # Feature components
 ├── lib/
 │   ├── supabase/          # Supabase client and DB helpers
-│   │   ├── client.ts      # Browser client
-│   │   ├── server.ts      # Server client
+│   │   ├── admin.ts       # Admin client (service role key — use in API routes)
+│   │   ├── client.ts      # Browser client (anon key — limited use)
+│   │   ├── server.ts      # Server client (anon key — do NOT use in API routes)
 │   │   └── db.ts          # Database query functions
 │   ├── auth.ts            # Auth utilities
 │   ├── claude.ts          # Claude API integration
@@ -87,6 +88,22 @@ src/
 - Use `NextRequest`/`NextResponse` from `next/server`
 - Parse FormData for file uploads, JSON for simple requests
 - Always validate required fields and return appropriate status codes
+- **All routes use `createAdminClient()`** from `@/lib/supabase/admin` (service role key, bypasses RLS)
+- **All routes must verify auth** — add this at the top of every handler:
+  ```typescript
+  const user = await getAuthUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  ```
+- Only `/api/auth/login` and `/api/auth/logout` skip auth checks
+
+### Security
+- **Never use `createClient()` from `@/lib/supabase/server` in API routes** — it uses the anon key which is blocked by RLS
+- **Never use the browser Supabase client to query data directly** — always go through API routes with `fetch()`
+- **Never add hardcoded secrets or fallback values** — all secrets must come from env vars
+- **Middleware protects all API routes** — returns 401 JSON for unauthenticated requests, 403 JSON for non-admin on `/api/admin/` routes
+- RLS policies deny all access via the anon key; only the service role key (used server-side) can access data
 
 ### Database
 - All queries go through `src/lib/supabase/db.ts`
@@ -117,6 +134,10 @@ src/
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=   # Server-side only — never expose to client
+
+# Auth
+JWT_SECRET=                  # Required — generate via: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 
 # AI APIs
 ANTHROPIC_API_KEY=          # Claude
@@ -159,8 +180,9 @@ type OutputStyleType =
 ### Add a new API route
 1. Create folder in `src/app/api/[routeName]/`
 2. Add `route.ts` with HTTP method handlers
-3. Use `createClient()` from `@/lib/supabase/server` for DB access
-4. Add DB helper functions to `src/lib/supabase/db.ts` if needed
+3. Add auth check at the top of each handler (`getAuthUser()`)
+4. Use `createAdminClient()` from `@/lib/supabase/admin` for DB access
+5. Add DB helper functions to `src/lib/supabase/db.ts` if needed
 
 ### Database migrations
 - SQL files go in `supabase/` folder
