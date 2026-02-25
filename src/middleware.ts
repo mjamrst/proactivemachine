@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
 const AUTH_COOKIE_NAME = 'idea_machine_auth';
-const JWT_SECRET = process.env.JWT_SECRET || 'idea-machine-secret-key-change-in-production';
+
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 
 interface JWTPayload {
   userId: string;
@@ -27,22 +31,42 @@ async function verifyTokenFromCookie(request: NextRequest): Promise<JWTPayload |
   }
 }
 
-// Routes that don't require authentication
-const publicRoutes = ['/login', '/api/auth/login', '/changelog'];
+// API routes that don't require authentication
+const publicApiRoutes = ['/api/auth/login', '/api/auth/logout'];
 
-// Routes that require admin role
-const adminRoutes = ['/admin'];
+// Page routes that don't require authentication
+const publicPageRoutes = ['/login', '/changelog'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip API routes except auth-related ones that need protection
-  if (pathname.startsWith('/api/') && !pathname.startsWith('/api/admin/')) {
+  // Handle API routes
+  if (pathname.startsWith('/api/')) {
+    // Allow public API routes without auth
+    if (publicApiRoutes.some(route => pathname === route)) {
+      return NextResponse.next();
+    }
+
+    // All other API routes require authentication
+    const user = await verifyTokenFromCookie(request);
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Admin API routes require admin role
+    if (pathname.startsWith('/api/admin/')) {
+      if (user.role !== 'admin') {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
     return NextResponse.next();
   }
 
-  // Allow public routes
-  if (publicRoutes.some(route => pathname.startsWith(route))) {
+  // Handle page routes
+  // Allow public page routes
+  if (publicPageRoutes.some(route => pathname.startsWith(route))) {
     // If already logged in and trying to access login, redirect to home
     const user = await verifyTokenFromCookie(request);
     if (user && pathname === '/login') {
@@ -51,7 +75,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check authentication for protected routes
+  // Check authentication for protected page routes
   const user = await verifyTokenFromCookie(request);
 
   if (!user) {
@@ -61,8 +85,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Check admin routes
-  if (adminRoutes.some(route => pathname.startsWith(route))) {
+  // Check admin page routes
+  if (pathname.startsWith('/admin')) {
     if (user.role !== 'admin') {
       // Not an admin, redirect to home
       return NextResponse.redirect(new URL('/', request.url));

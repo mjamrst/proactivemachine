@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getAuthUser } from '@/lib/auth';
 
 interface RouteParams {
@@ -20,7 +20,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     const { clientId } = await params;
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Check if client has any sessions
     const { count: sessionCount } = await supabase
@@ -98,7 +98,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Client name is required' }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Update the client
     const { data: client, error: updateError } = await supabase
@@ -134,7 +134,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const { clientId } = await params;
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     const { data: client, error } = await supabase
       .from('clients')

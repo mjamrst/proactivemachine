@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { getAuthUser } from '@/lib/auth';
 import { getClientDocuments, createClientDocument, deleteClientDocument } from '@/lib/supabase/db';
 import { isSupportedFile, getSupportedFileType } from '@/lib/documents';
 
@@ -10,8 +11,13 @@ interface RouteParams {
 // Get all documents for a client
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { clientId } = await params;
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const documents = await getClientDocuments(supabase, clientId);
     return NextResponse.json({ documents });
   } catch (error) {
@@ -26,6 +32,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // Upload a document for a client
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { clientId } = await params;
     const formData = await request.formData();
     const file = formData.get('document') as File;
@@ -54,7 +65,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Generate unique filename
     const fileExt = file.name.split('.').pop() || 'pdf';
@@ -103,6 +114,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 // Delete a document
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { clientId } = await params;
     const { searchParams } = new URL(request.url);
     const documentId = searchParams.get('documentId');
@@ -115,7 +131,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Delete from storage if URL provided
     if (fileUrl) {

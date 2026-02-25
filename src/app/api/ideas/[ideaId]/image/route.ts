@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { getAuthUser } from '@/lib/auth';
 
 interface RouteParams {
   params: Promise<{ ideaId: string }>;
@@ -8,6 +9,11 @@ interface RouteParams {
 // Upload image for an idea
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { ideaId } = await params;
     const formData = await request.formData();
     const file = formData.get('image') as File;
@@ -36,7 +42,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Verify the idea exists
     const { data: idea, error: ideaError } = await supabase
@@ -116,8 +122,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 // Delete image for an idea
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { ideaId } = await params;
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Get the current image URL
     const { data: idea, error: ideaError } = await supabase

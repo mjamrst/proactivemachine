@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getAuthUser } from '@/lib/auth';
 
 interface RouteParams {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Get file extension
     const ext = file.name.split('.').pop() || 'jpg';
@@ -115,7 +115,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     const { userId } = await params;
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Get current avatar URL to delete the file
     const { data: currentUser } = await supabase

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getAuthUser } from '@/lib/auth';
 
 interface RouteParams {
@@ -18,7 +18,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const body = await request.json();
     const { title, overview, features, brand_fit, image_prompt } = body;
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Get the idea and its session to check ownership
     const { data: idea, error: fetchError } = await supabase

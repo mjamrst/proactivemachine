@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function GET() {
   try {
@@ -14,7 +14,7 @@ export async function GET() {
     }
 
     // Fetch full user data including avatar_url from database
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data: user, error } = await supabase
       .from('users')
       .select('id, username, display_name, role, avatar_url')

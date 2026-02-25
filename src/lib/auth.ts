@@ -3,7 +3,10 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 
 export const AUTH_COOKIE_NAME = 'idea_machine_auth';
-const JWT_SECRET = process.env.JWT_SECRET || 'idea-machine-secret-key-change-in-production';
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 const SALT_ROUNDS = 10;
 
 export interface AuthUser {

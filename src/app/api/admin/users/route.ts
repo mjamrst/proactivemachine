@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getAuthUser, hashPassword } from '@/lib/auth';
 
 // GET /api/admin/users - List all users
@@ -14,7 +14,7 @@ export async function GET() {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     const { data: users, error } = await supabase
       .from('users')
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     const userRole = role === 'admin' ? 'admin' : 'user';
     const passwordHash = await hashPassword(password);
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Check if username already exists
     const { data: existingUser } = await supabase

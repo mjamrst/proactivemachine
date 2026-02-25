@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getAuthUser } from '@/lib/auth';
 
 export async function GET() {
@@ -13,7 +13,7 @@ export async function GET() {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Get user stats from view
     const { data: userStats, error: statsError } = await supabase

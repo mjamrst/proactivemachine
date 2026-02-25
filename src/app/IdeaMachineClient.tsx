@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { IdeaGeneratorForm, IdeasDisplay, LoadingSpinner } from '@/components';
 import type { GenerateFormData } from '@/components/forms';
 import type { Client, Property, Idea } from '@/types/database';
-import { createClient as createBrowserClient } from '@/lib/supabase/client';
-import { getClients, getProperties, createClient } from '@/lib/supabase/db';
 
 export function IdeaMachineClient() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -18,19 +16,25 @@ export function IdeaMachineClient() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createBrowserClient();
-
   useEffect(() => {
     async function loadData() {
       try {
-        const [clientsData, propertiesData] = await Promise.all([
-          getClients(supabase),
-          getProperties(supabase),
+        const [clientsRes, propertiesRes] = await Promise.all([
+          fetch('/api/clients'),
+          fetch('/api/properties'),
         ]);
-        setClients(clientsData);
-        setProperties(propertiesData);
+
+        if (!clientsRes.ok || !propertiesRes.ok) {
+          throw new Error('Failed to load data');
+        }
+
+        const clientsData = await clientsRes.json();
+        const propertiesData = await propertiesRes.json();
+
+        setClients(clientsData.clients);
+        setProperties(propertiesData.properties);
       } catch (err) {
-        setError('Failed to load data. Please check your Supabase connection.');
+        setError('Failed to load data. Please try refreshing the page.');
         console.error('Error loading data:', err);
       } finally {
         setIsLoading(false);
@@ -41,7 +45,18 @@ export function IdeaMachineClient() {
   }, []);
 
   const handleAddClient = async (name: string, domain?: string): Promise<Client> => {
-    const newClient = await createClient(supabase, { name, domain: domain || null });
+    const res = await fetch('/api/clients', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, domain: domain || null }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || 'Failed to create client');
+    }
+
+    const newClient = await res.json();
     setClients((prev) => [...prev, newClient].sort((a, b) => a.name.localeCompare(b.name)));
     return newClient;
   };

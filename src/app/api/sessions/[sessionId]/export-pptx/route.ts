@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { getAuthUser } from '@/lib/auth';
 import { getIdeaSessionById, getIdeasBySession, getClientById, getPropertiesByIds } from '@/lib/supabase/db';
 import pptxgen from 'pptxgenjs';
 
@@ -31,7 +32,13 @@ export async function GET(
 ) {
   try {
     const { sessionId } = await params;
-    const supabase = await createClient();
+
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const supabase = createAdminClient();
 
     // Fetch all required data
     const session = await getIdeaSessionById(supabase, sessionId);

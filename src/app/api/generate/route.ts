@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { generateIdeas } from '@/lib/generate-ideas';
 import { getAuthUser } from '@/lib/auth';
 import {
@@ -20,6 +20,11 @@ import type { IdeaLane, TechModifier, AudienceModifier, PlatformModifier, Budget
 
 export async function POST(request: NextRequest) {
   try {
+    const authUser = await getAuthUser();
+    if (!authUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     // Handle FormData
     const formData = await request.formData();
 
@@ -61,7 +66,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Fetch client and properties from database
     const [client, properties, clientDocuments] = await Promise.all([
@@ -140,9 +145,6 @@ export async function POST(request: NextRequest) {
       model,
     });
 
-    // Get current user
-    const authUser = await getAuthUser();
-
     // Create idea session in database
     const session = await createIdeaSession(supabase, {
       client_id,
@@ -155,7 +157,7 @@ export async function POST(request: NextRequest) {
       content_style: null,
       ai_model: model,
       num_ideas,
-      user_id: authUser?.id || null,
+      user_id: authUser.id,
       name: session_name || null,
     });
 

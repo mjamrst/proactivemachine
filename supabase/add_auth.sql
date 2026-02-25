@@ -81,19 +81,14 @@ GROUP BY u.id, u.username, u.display_name, u.role, u.created_at, u.last_login_at
 -- ============================================
 -- INITIAL ADMIN USER
 -- ============================================
--- The password hash below is for: admin123
--- IMPORTANT: Change this password immediately after first login!
+-- To create an admin user, generate a bcrypt hash and run:
 --
--- To generate a new hash, run this Node.js code:
--- const bcrypt = require('bcrypt');
--- bcrypt.hash('your-password', 10).then(console.log);
-
-INSERT INTO users (username, password_hash, display_name, role) VALUES (
-  'admin',
-  '$2b$10$9eX65hS.iGjpZBppc//FR.g/xNMVpZF.iDU/5nKGQacD6gu8wr2j6',
-  'Administrator',
-  'admin'
-);
-
--- IMPORTANT: The password for 'admin' is 'admin123'
--- Change this password immediately after first login via the admin panel!
+--   1. Generate hash: node -e "require('bcrypt').hash('YOUR_SECURE_PASSWORD', 10).then(console.log)"
+--   2. Insert user:
+--
+-- INSERT INTO users (username, password_hash, display_name, role) VALUES (
+--   'admin',
+--   '$2b$10$YOUR_GENERATED_HASH_HERE',
+--   'Administrator',
+--   'admin'
+-- );
